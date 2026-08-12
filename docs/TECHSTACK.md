@@ -52,19 +52,20 @@ Phiên bản là **range khai báo** trong `package.json`.
 
 ## 2. Cấu hình — mỗi mảnh nối dây ở đâu
 
-| File                   | Nội dung đáng nhớ                                                                                               |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `vite.config.ts`       | Thứ tự plugin `devtools() → tailwindcss() → tanstackStart() → viteReact()`; `devtools()` **bắt buộc đứng đầu**  |
-| `tsconfig.json`        | `strict`, `verbatimModuleSyntax`, `noUnusedLocals/Parameters`, `moduleResolution: bundler`, `jsx: react-jsx`    |
-| `tsr.config.json`      | `{ "target": "react" }` — cấu hình sinh route                                                                   |
-| `drizzle.config.ts`    | dialect `postgresql`, schema `./src/db/schema.ts`, migration ra `./drizzle`, đọc env từ `.env.local` rồi `.env` |
-| `eslint.config.js`     | Kế thừa `@tanstack/eslint-config`, tắt `import/order`, `sort-imports`, `require-await`, vài rule khác           |
-| `prettier.config.js`   | `semi: false`, `singleQuote: true`, `trailingComma: 'all'` — quản cả markdown trong `docs/`                     |
-| `.env.local`           | `DATABASE_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET` (gitignore qua `*.local`)                               |
-| `components.json`      | Cấu hình shadcn: `style: base-nova` (tiền tố `base-` chính là thứ chọn Base UI thay vì Radix), alias theo `#/`  |
-| `commitlint.config.js` | `extends: ['@commitlint/config-conventional']` — luật cho thông điệp commit                                     |
-| `.husky/`              | `pre-commit` → `lint-staged`; `commit-msg` → `commitlint --edit "$1"`. Cài lại bằng `npm install`               |
-| `package.json`         | Khoá `lint-staged`: `*.{ts,tsx,js,jsx}` → Prettier + ESLint `--fix`; `*.{json,md,css,yml,yaml}` → Prettier      |
+| File                   | Nội dung đáng nhớ                                                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `vite.config.ts`       | Thứ tự plugin `devtools() → tailwindcss() → tanstackStart() → viteReact()`; `devtools()` **bắt buộc đứng đầu**                        |
+| `tsconfig.json`        | `strict`, `verbatimModuleSyntax`, `noUnusedLocals/Parameters`, `moduleResolution: bundler`, `jsx: react-jsx`                          |
+| `tsr.config.json`      | `{ "target": "react" }` — cấu hình sinh route                                                                                         |
+| `drizzle.config.ts`    | dialect `postgresql`, schema `./src/db/schema.ts`, migration ra `./drizzle`, đọc env từ `.env.local` rồi `.env`                       |
+| `eslint.config.js`     | Kế thừa `@tanstack/eslint-config`, tắt `import/order`, `sort-imports`, `require-await`, vài rule khác                                 |
+| `prettier.config.js`   | `semi: false`, `singleQuote: true`, `trailingComma: 'all'` — quản cả markdown trong `docs/`                                           |
+| `.env.local`           | `DATABASE_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `GH_TOKEN` (gitignore qua `*.local`); mẫu ở `.env.example`                   |
+| `docker-compose.yaml`  | Postgres cục bộ cho dev (`local_office`/`local_office`), cổng host **5433** (5432 hay bị máy dev chiếm) — `npm run db:up` / `db:down` |
+| `components.json`      | Cấu hình shadcn: `style: base-nova` (tiền tố `base-` chính là thứ chọn Base UI thay vì Radix), alias theo `#/`                        |
+| `commitlint.config.js` | `extends: ['@commitlint/config-conventional']` — luật cho thông điệp commit                                                           |
+| `.husky/`              | `pre-commit` → `lint-staged`; `commit-msg` → `commitlint --edit "$1"`. Cài lại bằng `npm install`                                     |
+| `package.json`         | Khoá `lint-staged`: `*.{ts,tsx,js,jsx}` → Prettier + ESLint `--fix`; `*.{json,md,css,yml,yaml}` → Prettier                            |
 
 **Alias import:** `package.json → imports: { "#/*": "./src/*" }`. `tsconfig.json` khai báo thêm `@/*` nhưng không code nào dùng — giữ `#/` cho nhất quán.
 
@@ -99,15 +100,17 @@ src/
 
 ## 4. Lệnh
 
-| Lệnh                                                | Việc                                    |
-| --------------------------------------------------- | --------------------------------------- |
-| `npm run dev`                                       | Dev server tại `http://localhost:3000`  |
-| `npm run build` · `npm run preview`                 | Build production và xem thử             |
-| `npm run generate-routes`                           | Sinh lại `src/routeTree.gen.ts`         |
-| `npm run lint` · `npm run format` · `npm run check` | Lint · format+fix · kiểm tra định dạng  |
-| `npm run db:generate` · `db:migrate` · `db:push`    | Migration Drizzle                       |
-| `npm run db:studio`                                 | Trình duyệt CSDL                        |
-| `npx shadcn@latest add <tên>`                       | Thêm component vào `src/components/ui/` |
+| Lệnh                                                | Việc                                                                |
+| --------------------------------------------------- | ------------------------------------------------------------------- |
+| `npm run dev`                                       | Dev server tại `http://localhost:3000`                              |
+| `npm run build` · `npm run preview`                 | Build production và xem thử                                         |
+| `npm run generate-routes`                           | Sinh lại `src/routeTree.gen.ts`                                     |
+| `npm run lint` · `npm run format` · `npm run check` | Lint · format+fix · kiểm tra định dạng                              |
+| `npm run db:generate` · `db:migrate` · `db:push`    | Migration Drizzle                                                   |
+| `npm run db:studio`                                 | Trình duyệt CSDL                                                    |
+| `npm run db:up` · `db:down`                         | Bật/tắt Postgres cục bộ qua Docker Compose                          |
+| `npx -y @better-auth/cli migrate`                   | Sinh bảng `user`/`session`/`account`/`verification` cho Better Auth |
+| `npx shadcn@latest add <tên>`                       | Thêm component vào `src/components/ui/`                             |
 
 Không có script `test` hay `typecheck`.
 
@@ -125,4 +128,4 @@ Ba thứ tính năng cốt lõi trong `CLAUDE.md` cần tới, chưa có gói n�
 
 Về engine tài liệu, điểm dễ sai khi khảo sát: nhiều thư viện Office phổ biến chỉ đi **một chiều** — có bộ chỉ đọc/render, có bộ chỉ sinh file mới từ số không. Ghép một bộ đọc với một bộ ghi **không tự động cho ra khứ hồi**: phần tài liệu mà bộ đọc bỏ qua sẽ biến mất khi bộ ghi dựng lại file. Tiêu chí chọn phải là "parse và serialize lại _cùng_ một tài liệu", kiểm chứng bằng file thật mở lại bằng Microsoft Office.
 
-Ngoài ra, `src/lib/auth.ts` **chưa cấu hình `database` adapter** → Better Auth đang chạy stateless, chưa có bảng `user/session/account/verification` và thư mục `drizzle/` chưa có migration nào. Cần nối `pg` Pool rồi chạy `npx @better-auth/cli migrate` trước khi dùng tính năng tài khoản (`README.md` có sẵn snippet).
+`src/lib/auth.ts` đã nối `database` adapter (`pg` Pool) và đã chạy `npx @better-auth/cli migrate` — bảng `user`/`session`/`account`/`verification` tồn tại thật, không còn stateless. Postgres cục bộ chạy qua `docker-compose.yaml` (`npm run db:up`).
