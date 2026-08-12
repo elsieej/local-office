@@ -16,6 +16,7 @@ Làm cho Better Auth chạy có trạng thái thật (không còn stateless): n�
 - [x] Sinh migration cho bảng `user`/`session`/`account`/`verification` bằng `npx @better-auth/cli migrate` (hoặc generate rồi `npm run db:migrate`) · `drizzle/`
 - [x] Cập nhật `docs/TECHSTACK.md` mục "Mảnh còn thiếu" — bỏ dòng nói `auth.ts` chưa nối adapter · `docs/TECHSTACK.md`
 - [x] Thêm `docker-compose.yaml` (Postgres cục bộ, cổng host 5433) + `.env.example` + script `db:up`/`db:down` — cần thiết để có DB thật chạy adapter · `docker-compose.yaml`, `.env.example`, `package.json`
+- [x] `vite.config.ts`: bật `server.strictPort` — khi cổng 3000 bị chiếm, `npm run dev` báo lỗi ngay thay vì âm thầm đổi cổng rồi gây `403 INVALID_ORIGIN` lúc đăng ký/đăng nhập thật (`BETTER_AUTH_URL` ghi cứng `:3000`) · `vite.config.ts`
 
 ## Kiểm thử
 
@@ -28,3 +29,5 @@ Làm cho Better Auth chạy có trạng thái thật (không còn stateless): n�
 ## Ghi chú
 
 Phải xong trước TASK-2/TASK-3 — không thể kiểm thử thật các trang đăng ký/đăng nhập khi backend vẫn stateless.
+
+Phát hiện qua kiểm thử tay: cổng 3000 bị chiếm khiến Vite tự đổi cổng, `BETTER_AUTH_URL` lệch theo → đăng ký thật báo `403 INVALID_ORIGIN`. Đã sửa bằng `server.strictPort` ở `vite.config.ts`.
