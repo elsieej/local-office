@@ -115,3 +115,23 @@ Thao tác xoá phụ thuộc trạng thái:
 - [Ngăn xếp công nghệ](docs/TECHSTACK.md) — các gói và phiên bản, file cấu hình, cấu trúc thư mục, lệnh, và những mảnh còn chưa chọn
 - [Quy tắc viết mã](docs/RULE.md) — đặt tên component, hook, file; quy ước TypeScript; style giao diện; ranh giới client/server
 - [Mẫu tài liệu](docs/templates/) — [feature](docs/templates/FEATURE_TEMPLATE.md) → [user story](docs/templates/USER_STORY_TEMPLATE.md) → [task](docs/templates/TASK_TEMPLATE.md); quy trình từ task tới issue GitHub và cách đóng ngược lên nằm trong mẫu task
+
+---
+
+## Agent skills
+
+### Issue tracker
+
+Issue được theo dõi bằng GitHub Issues của `elsieej/local-office`, thao tác qua GitHub REST API với `GH_TOKEN` từ `.env.local`. Xem `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Dùng nguyên năm nhãn chuẩn: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. Xem `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Bố cục đơn ngữ cảnh — `CONTEXT.md` và `docs/adr/` ở gốc repo. Xem `docs/agents/domain.md`.
+
+### Git workflow
+
+Một issue = một nhánh = một PR. Quy ước đặt tên nhánh, tạo nhánh từ `main`, rebase, mở PR, squash-merge và dọn nhánh sau merge. Xem `docs/agents/git-workflow.md`.
