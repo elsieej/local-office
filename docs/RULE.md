@@ -209,15 +209,14 @@ Cần một loại tài liệu chưa có template? Tạo template trước, rồ
 
 ### Tên file: `<số thứ tự>_<tên>.md`
 
-Ba chữ số, gạch dưới, rồi tên mô tả bằng `snake_case`:
+Số thứ tự không đệm số 0, gạch dưới, rồi tên mô tả bằng `snake_case`:
 
 ```
-docs/features/001_mo_va_xem_tai_lieu.md
-docs/stories/001_keo_tha_mo_docx_story.md
-docs/tasks/001_vung_keo_tha_task.md
+docs/features/1_mo_va_xem_tai_lieu.md
+docs/stories/1_keo_tha_mo_docx_story.md
+docs/tasks/1_vung_keo_tha_task.md
 ```
 
-- **Ba chữ số** — `001`, không phải `1`. Để thư mục tự sắp đúng thứ tự khi tới file thứ 10.
 - **Số tăng dần trong từng thư mục**, không dùng chung giữa `features/`, `stories/`, `tasks/`. Số đã cấp thì không tái sử dụng, kể cả khi tài liệu bị bỏ.
 - **Hậu tố `_story` / `_task` / `_feature`** giúp nhận ra loại tài liệu khi mở nhiều tab cùng lúc — tuỳ chọn, nhưng đã dùng thì dùng nhất quán.
 
@@ -276,3 +275,15 @@ Cấu hình nằm ở `commitlint.config.js` — đó mới là nguồn sự th�
 2. `npm run lint` — không còn cảnh báo.
 3. `// eslint-disable` chỉ chấp nhận khi kèm lý do trên cùng dòng.
 4. `src/routeTree.gen.ts` do máy sinh — không sửa tay, chạy `npm run generate-routes`.
+
+---
+
+## 9. Kiểm thử giao diện qua Playwright MCP
+
+Repo có sẵn MCP server `playwright` khai báo ở [`.mcp.json`](../.mcp.json) (Chromium qua Brave). Dùng nó để kiểm thử tay các luồng UI **thật trên trình duyệt**, thay vì chỉ đọc code rồi suy đoán hành vi.
+
+- Khi một task đụng tới giao diện (route mới, form, trạng thái loading/error/empty…), chạy `npm run dev` rồi dùng công cụ `mcp__playwright__browser_*` (`browser_navigate`, `browser_click`, `browser_type`, `browser_fill_form`, `browser_snapshot`, `browser_take_screenshot`, `browser_console_messages`…) để đi qua **luồng chính và luồng phụ** trước khi tick ô trong mục "Kiểm thử" của task.
+- Ưu tiên `browser_snapshot` (accessibility tree) để xác nhận nội dung/nhãn — hợp với yêu cầu "mỗi component tương tác phải có nhãn cho screen reader" ở mục 4, và hợp để xác nhận đúng nhãn trạng thái tài liệu (🔒 Cục bộ / ☁️ Đã tải lên). Dùng `browser_take_screenshot` khi cần xác nhận bố cục/hình ảnh.
+- `browser_console_messages` và `browser_network_requests` hữu ích để xác nhận các bất biến quyền riêng tư ở `CLAUDE.md` — ví dụ kiểm tra tab Network không có request nào gửi nội dung tài liệu 🔒 Cục bộ ra ngoài.
+- Đây là bước **bổ sung**, không thay thế `npm run lint` / `npm run format`: lint bắt lỗi mã, Playwright MCP xác nhận hành vi thật của người dùng.
+- Không dùng cho phần chạy được ngoại tuyến mà không cần trình duyệt thật (ví dụ logic parse thuần trong Worker) — ở đó unit test (khi repo có framework test) phù hợp hơn.

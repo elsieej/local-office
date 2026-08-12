@@ -25,7 +25,9 @@
 ## Kiểm thử
 
 <!-- Cách kiểm chứng cụ thể, không phải "test kỹ". Ghi rõ lệnh chạy hoặc
-     thao tác trên giao diện và kết quả mong đợi. -->
+     thao tác trên giao diện và kết quả mong đợi. Task đụng tới UI thì
+     "thao tác trên giao diện" nghĩa là dùng Playwright MCP trên trình
+     duyệt thật — xem RULE.md §9, không phải suy đoán từ code. -->
 
 - [ ] `npm run lint` sạch
 - [ ] Kiểm thử tay: <thao tác> → <kết quả mong đợi>
