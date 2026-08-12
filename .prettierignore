@@ -1,0 +1,12 @@
+# khối intent-skills do `npx @tanstack/intent` sinh ra, prettier dedent làm hỏng thụt lề
+AGENTS.md
+
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# skill vendored từ mattpocock/skills, có computedHash trong skills-lock.json —
+# prettier định dạng lại sẽ làm lệch hash
+.agents/
+.claude/
+.husky/_/
