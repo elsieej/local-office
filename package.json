@@ -18,6 +18,8 @@
     "db:push": "drizzle-kit push",
     "db:pull": "drizzle-kit pull",
     "db:studio": "drizzle-kit studio",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
     "prepare": "husky"
   },
   "dependencies": {

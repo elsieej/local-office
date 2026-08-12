@@ -50,9 +50,16 @@ npm run check
 
 2. Visit the [Better Auth documentation](https://www.better-auth.com) to unlock the full potential of authentication in your app.
 
-### Adding a Database (Optional)
+### Adding a Database
 
-Better Auth can work in stateless mode, but to persist user data, add a database:
+Better Auth can work in stateless mode, but this project persists user data. Start a local Postgres with Docker Compose (`docker-compose.yaml`, exposed on host port `5433` to avoid clashing with other local Postgres instances on `5432`):
+
+```bash
+npm run db:up    # docker compose up -d
+npm run db:down  # docker compose down
+```
+
+`.env.local` already points `DATABASE_URL` at this container — copy `.env.example` if you don't have one yet. The database adapter is wired up:
 
 ```typescript
 // src/lib/auth.ts
