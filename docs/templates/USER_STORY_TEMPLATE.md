@@ -1,6 +1,6 @@
 # US-<số>: <Tên ngắn gọn>
 
-> Copy thành `docs/stories/<số>_<ten>_story.md` (ví dụ `001_keo_tha_mo_docx_story.md`) rồi điền. Xoá các dòng `<!-- -->`.
+> Copy thành `docs/stories/<số>_<ten>_story.md` (ví dụ `1_keo_tha_mo_docx_story.md`) rồi điền. Xoá các dòng `<!-- -->`.
 
 **Feature:** [<tên>](../features/<số>_<tên>_feature.md)
 **Trạng thái:** ⬜ Nháp · 🟡 Đang làm · ✅ Xong
@@ -53,7 +53,7 @@ Mọi ô ở **Mong muốn** và **Task** đều tick → đổi **Trạng thái
 
 **Task**
 
-- [x] [TASK-001: Vùng kéo–thả và đọc file](../tasks/001_vung_keo_tha_task.md) · #12
-- [ ] [TASK-002: Parse và render docx trong worker](../tasks/002_docx_worker_task.md) · #13
+- [x] [TASK-1: Vùng kéo–thả và đọc file](../tasks/1_vung_keo_tha_task.md) · #12
+- [ ] [TASK-2: Parse và render docx trong worker](../tasks/2_docx_worker_task.md) · #13
 
 </details>

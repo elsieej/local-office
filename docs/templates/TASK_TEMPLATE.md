@@ -1,6 +1,6 @@
 # TASK-<số>: <Tên việc>
 
-> Copy thành `docs/tasks/<số>_<ten>_task.md` (ví dụ `001_vung_keo_tha_task.md`) rồi điền. Xoá các dòng `<!-- -->`.
+> Copy thành `docs/tasks/<số>_<ten>_task.md` (ví dụ `1_vung_keo_tha_task.md`) rồi điền. Xoá các dòng `<!-- -->`.
 > Một task = một issue GitHub = một nhánh = một PR.
 
 **Story:** [US-<số>](../stories/<số>_<tên>_story.md)

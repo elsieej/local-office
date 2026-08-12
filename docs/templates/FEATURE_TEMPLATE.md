@@ -1,6 +1,6 @@
 # Feature: <Tên tính năng>
 
-> Copy file này thành `docs/features/<số>_<ten>_feature.md` (ví dụ `001_mo_va_xem_tai_lieu_feature.md`) rồi điền.
+> Copy file này thành `docs/features/<số>_<ten>_feature.md` (ví dụ `1_mo_va_xem_tai_lieu_feature.md`) rồi điền.
 > Feature là một mảng tính năng hoàn chỉnh, gồm nhiều user story.
 > Nếu việc cần làm chỉ gói trong một story, dùng [`USER_STORY_TEMPLATE.md`](USER_STORY_TEMPLATE.md) thay vì file này.
 
@@ -79,8 +79,8 @@
 
 <!-- Tick khi story đó chuyển sang ✅ Xong. Xem quy trình ở TASK_TEMPLATE.md. -->
 
-- [ ] [US-001: <tên>](../stories/001_<tên>_story.md)
-- [ ] [US-002: <tên>](../stories/002_<tên>_story.md)
+- [ ] [US-1: <tên>](../stories/1_<tên>_story.md)
+- [ ] [US-2: <tên>](../stories/2_<tên>_story.md)
 
 Feature chỉ đóng khi mọi ô ở đây đã tick **và** checklist mục 10 đã chạy hết.
 
