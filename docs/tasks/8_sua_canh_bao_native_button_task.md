@@ -1,8 +1,8 @@
 # TASK-8: Sửa cảnh báo Base UI `nativeButton` khi `Button` render qua `Link`/`a`
 
 **Story:** Không thuộc user story nào — hotfix phát hiện khi kiểm thử [TASK-1](1_noi_database_adapter_task.md) qua Playwright MCP, ảnh hưởng chung mọi nơi dùng `Button` với prop `render`.
-**Issue:** #TBD · **Nhánh:** `fix/base-ui-native-button-warning`
-**Trạng thái:** 🟡 Đang làm
+**Issue:** #8 · **Nhánh:** `fix/base-ui-native-button-warning`
+**Trạng thái:** 🔵 Chờ review
 
 ---
 
