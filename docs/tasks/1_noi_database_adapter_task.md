@@ -23,9 +23,8 @@ Làm cho Better Auth chạy có trạng thái thật (không còn stateless): n�
 - [x] Kiểm thử tay: đăng ký qua `POST /api/auth/sign-up/email` → bảng `user`/`session` trong Postgres (`docker exec ... psql`) có bản ghi tương ứng
 - [x] Kiểm thử tay: `GET /api/auth/get-session` với cookie phiên vừa tạo → trả về đúng session/user (phiên đọc được từ DB, không còn stateless)
 - [x] Trường hợp biên: `DATABASE_URL` sai/không kết nối được → request trả `500`, server không crash tiến trình
+- [x] Kiểm thử qua Playwright MCP (RULE.md §9): mở `/demo/better-auth` trên trình duyệt thật, đăng ký một tài khoản qua form → vào thẳng ứng dụng không cần đăng nhập lại; điều hướng sang `/` → vẫn đăng nhập (xác nhận UI, không chỉ API); đăng xuất → về trạng thái ẩn danh
 
 ## Ghi chú
 
 Phải xong trước TASK-2/TASK-3 — không thể kiểm thử thật các trang đăng ký/đăng nhập khi backend vẫn stateless.
-
-Postgres cục bộ chiếm cổng host **5433** thay vì 5432 mặc định — máy dev đã có container Postgres khác (`hr4o-postgres`) chiếm 5432. `docker-compose.yaml` và `.env.example` đều dùng 5433; đổi lại nếu máy khác không xung đột.
