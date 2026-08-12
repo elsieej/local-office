@@ -217,7 +217,6 @@ docs/stories/1_keo_tha_mo_docx_story.md
 docs/tasks/1_vung_keo_tha_task.md
 ```
 
-- **Không đệm số 0** — `1`, `2`, `3`…, không phải `001`, `002`. ID hiển thị trong tiêu đề (`US-<n>`, `TASK-<n>`) dùng đúng số này, không đệm.
 - **Số tăng dần trong từng thư mục**, không dùng chung giữa `features/`, `stories/`, `tasks/`. Số đã cấp thì không tái sử dụng, kể cả khi tài liệu bị bỏ.
 - **Hậu tố `_story` / `_task` / `_feature`** giúp nhận ra loại tài liệu khi mở nhiều tab cùng lúc — tuỳ chọn, nhưng đã dùng thì dùng nhất quán.
 
