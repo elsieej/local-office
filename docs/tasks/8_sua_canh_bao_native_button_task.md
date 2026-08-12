@@ -2,7 +2,7 @@
 
 **Story:** Không thuộc user story nào — hotfix phát hiện khi kiểm thử [TASK-1](1_noi_database_adapter_task.md) qua Playwright MCP, ảnh hưởng chung mọi nơi dùng `Button` với prop `render`.
 **Issue:** #8 · **Nhánh:** `fix/base-ui-native-button-warning`
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 
