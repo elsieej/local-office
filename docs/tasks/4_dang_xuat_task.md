@@ -2,7 +2,7 @@
 
 **Story:** [US-2](../stories/2_dang_nhap_dang_xuat_story.md)
 **Issue:** #4 · **Nhánh:** `feat/dang-xuat-header`
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 

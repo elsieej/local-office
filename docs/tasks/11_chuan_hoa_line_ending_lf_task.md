@@ -2,7 +2,7 @@
 
 **Story:** Không thuộc user story nào — dọn dẹp hạ tầng, phát hiện xuyên suốt các task trước: gần như mọi lần `git switch`/`git checkout` đều để lại một loạt file "M" giả trong `git status` (nội dung thật không đổi — `git diff` luôn rỗng), phải xác nhận thủ công nhiều lần trước khi commit, gây nhiễu và tốn thời gian.
 **Issue:** #16 · **Nhánh:** `fix/normalize-line-endings`
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 

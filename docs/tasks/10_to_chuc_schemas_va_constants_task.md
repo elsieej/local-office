@@ -2,7 +2,7 @@
 
 **Story:** Không thuộc user story nào — refactor phát sinh khi làm [TASK-3](3_trang_dang_nhap_task.md): schema `zod` và mã lỗi Better Auth hiện đang khai báo thẳng trong `src/routes/login.tsx`, cần tách ra chỗ dùng chung trước khi các route khác cũng cần validate/xử lý lỗi tương tự.
 **Issue:** #14 · **Nhánh:** `feat/trang-dang-nhap` (làm chung với TASK-3, vì code cần tách chưa tồn tại trên `main`)
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 

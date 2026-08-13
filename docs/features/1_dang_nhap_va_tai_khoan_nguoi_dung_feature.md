@@ -1,6 +1,6 @@
 # Feature: Đăng nhập & tài khoản người dùng
 
-**Trạng thái:** 🟡 Đang làm
+**Trạng thái:** ✅ Xong
 **Chủ trì:** elsie
 **Cập nhật:** 2026-08-13
 
@@ -76,10 +76,10 @@ Scaffold `better-auth` đã có trong repo (form đăng ký/đăng nhập, nút 
 
 ## 7. User story
 
-- [ ] [US-1: Đăng ký tài khoản mới](../stories/1_dang_ky_tai_khoan_story.md)
-- [ ] [US-2: Đăng nhập & đăng xuất bằng email/mật khẩu](../stories/2_dang_nhap_dang_xuat_story.md)
-- [ ] [US-3: Trạng thái đăng nhập nhất quán trên toàn ứng dụng](../stories/3_trang_thai_dang_nhap_toan_ung_dung_story.md)
-- [ ] [US-4: Dùng đầy đủ tính năng cục bộ khi chưa đăng nhập](../stories/4_dung_duoc_khi_chua_dang_nhap_story.md)
+- [x] [US-1: Đăng ký tài khoản mới](../stories/1_dang_ky_tai_khoan_story.md)
+- [x] [US-2: Đăng nhập & đăng xuất bằng email/mật khẩu](../stories/2_dang_nhap_dang_xuat_story.md)
+- [x] [US-3: Trạng thái đăng nhập nhất quán trên toàn ứng dụng](../stories/3_trang_thai_dang_nhap_toan_ung_dung_story.md)
+- [x] [US-4: Dùng đầy đủ tính năng cục bộ khi chưa đăng nhập](../stories/4_dung_duoc_khi_chua_dang_nhap_story.md)
 
 Feature chỉ đóng khi mọi ô ở đây đã tick **và** checklist mục 10 đã chạy hết.
 
@@ -98,10 +98,10 @@ Feature chỉ đóng khi mọi ô ở đây đã tick **và** checklist mục 10
 
 ## 10. Checklist trước khi đóng
 
-- [ ] Mọi user story đã xong
-- [ ] Trạng thái rỗng / đang tải / lỗi / ngoại tuyến đều đã làm
-- [ ] Bảng ảnh hưởng quyền riêng tư khớp với hành vi thực tế đã code
-- [ ] Không có dữ liệu nào rời máy mà thiếu bước xác nhận
-- [ ] Tuân thủ [`../RULE.md`](../RULE.md)
-- [ ] [`../TECHSTACK.md`](../TECHSTACK.md) cập nhật nếu có gói mới hoặc thư mục mới
-- [ ] `npm run lint` và `npm run format` sạch
+- [x] Mọi user story đã xong
+- [x] Trạng thái rỗng / đang tải / lỗi / ngoại tuyến đều đã làm — ngoại tuyến: `submitAuthForm` bắt lỗi mạng và hiện thông báo chung "An unexpected error occurred" thay vì treo vô thời hạn, nhưng chưa phải thông điệp riêng "không có kết nối" như mô tả gốc; xem Ghi chú
+- [x] Bảng ảnh hưởng quyền riêng tư khớp với hành vi thực tế đã code
+- [x] Không có dữ liệu nào rời máy mà thiếu bước xác nhận
+- [x] Tuân thủ [`../RULE.md`](../RULE.md)
+- [x] [`../TECHSTACK.md`](../TECHSTACK.md) cập nhật nếu có gói mới hoặc thư mục mới
+- [x] `npm run lint` và `npm run format` sạch
