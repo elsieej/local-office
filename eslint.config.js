@@ -23,6 +23,13 @@ export default [
     },
   },
   {
-    ignores: ['eslint.config.js', 'prettier.config.js', 'commitlint.config.js'],
+    ignores: [
+      'eslint.config.js',
+      'prettier.config.js',
+      'commitlint.config.js',
+      // Asset ONLYOFFICE do scripts/vendor-onlyoffice.mjs sinh ra (gitignored) —
+      // mã bên thứ ba, không phải code của repo.
+      'public/onlyoffice/**',
+    ],
   },
 ]

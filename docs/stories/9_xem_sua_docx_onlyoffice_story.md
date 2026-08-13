@@ -28,7 +28,7 @@
 
 ## Task
 
-- [ ] [TASK-19: Vendor pipeline asset ONLYOFFICE + `x2t.wasm`](../tasks/19_vendor_pipeline_onlyoffice_task.md) · #38
+- [x] [TASK-19: Vendor pipeline asset ONLYOFFICE + `x2t.wasm`](../tasks/19_vendor_pipeline_onlyoffice_task.md) · #38
 - [ ] TASK-20: Thêm `LICENSE` AGPL-3.0 + trang "Tải mã nguồn" — chưa viết task doc, mở sau khi TASK-19 xong
 - [ ] TASK-21: Tích hợp `DocEditor` vào `/documents/$documentId`, 2 nút Xem/Sửa — chưa viết task doc
 - [ ] TASK-22: Lưu khứ hồi + đo network payload/egress thật — chưa viết task doc
