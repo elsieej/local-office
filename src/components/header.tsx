@@ -1,17 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import { ChevronDownIcon } from 'lucide-react'
 import BetterAuthHeader from '#/integrations/better-auth/header-user'
 import ThemeToggle from '#/components/theme-toggle'
 import { Button } from '#/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '#/components/ui/dropdown-menu'
-
-const DEMO_LINKS = [{ to: '/demo/drizzle', label: 'Drizzle' }] as const
 
 export default function Header() {
   return (
@@ -51,29 +41,6 @@ export default function Header() {
           >
             Docs
           </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button variant="ghost">
-                  Demos
-                  <ChevronDownIcon data-icon="inline-end" />
-                </Button>
-              }
-            />
-            <DropdownMenuContent align="start">
-              <DropdownMenuGroup>
-                {DEMO_LINKS.map((link) => (
-                  <DropdownMenuItem
-                    key={link.to}
-                    render={<Link to={link.to} />}
-                  >
-                    {link.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
         <div className="ml-auto flex items-center gap-1">
