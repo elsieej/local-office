@@ -25,6 +25,7 @@ import {
 import { Skeleton } from '#/components/ui/skeleton'
 import DocumentKindIcon from '#/components/document-kind-icon'
 import DocumentStateBadge from '#/components/document-state-badge'
+import OnlyofficeEditor from '#/components/onlyoffice-editor'
 import PdfViewer from '#/components/pdf-viewer'
 import {
   formatDocumentOpenedAt,
@@ -73,10 +74,11 @@ function DocumentDetailPage() {
   })
 
   const isPdf = documentQuery.data?.kind === 'pdf'
+  const isWord = documentQuery.data?.kind === 'word'
   const fileQuery = useQuery({
     queryKey: [...DOCUMENTS_QUERY_KEY, documentId, 'bytes'],
     queryFn: () => openDocument(documentId),
-    enabled: isPdf,
+    enabled: isPdf || isWord,
   })
 
   const deleteMutation = useMutation({
@@ -156,15 +158,26 @@ function DocumentDetailPage() {
       </Card>
 
       {isPdf && fileQuery.data && <PdfViewer file={fileQuery.data} />}
-      {isPdf && fileQuery.isPending && <Skeleton className="h-96 w-full" />}
-      {isPdf && fileQuery.isError && (
+
+      {isWord && fileQuery.data && (
+        <OnlyofficeEditor
+          file={fileQuery.data}
+          fileType={doc.extension.slice(1)}
+          title={doc.name}
+        />
+      )}
+
+      {(isPdf || isWord) && fileQuery.isPending && (
+        <Skeleton className="h-96 w-full" />
+      )}
+      {(isPdf || isWord) && fileQuery.isError && (
         <Alert variant="destructive">
-          <AlertTitle>Không đọc được nội dung PDF</AlertTitle>
+          <AlertTitle>Không đọc được nội dung tài liệu</AlertTitle>
           <AlertDescription>Thử tải lại trang.</AlertDescription>
         </Alert>
       )}
 
-      {!isPdf && (
+      {!isPdf && !isWord && (
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">

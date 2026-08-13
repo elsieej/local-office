@@ -18,9 +18,10 @@ export type DocumentExtension = keyof typeof DOCUMENT_EXTENSION_KIND
 
 export type DocumentKind = (typeof DOCUMENT_EXTENSION_KIND)[DocumentExtension]
 
-/** Đuôi hiện xem được trong trình duyệt — xem TASK-16/17, engine Office thật chưa chọn. */
+/** Đuôi hiện xem được trong trình duyệt — 'word' qua ONLYOFFICE từ TASK-21. */
 export const VIEWABLE_DOCUMENT_KIND: ReadonlySet<DocumentKind> = new Set([
   'pdf',
+  'word',
 ])
 
 export const MAX_DOCUMENT_SIZE_BYTES = 200 * 1024 * 1024
