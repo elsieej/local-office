@@ -52,22 +52,22 @@ Người dùng cần mở nhanh một tài liệu trên máy không cài Office,
 
 ### Trạng thái giao diện
 
-| Trạng thái  | Hiển thị gì                                                                 |
-| ----------- | --------------------------------------------------------------------------- |
-| Rỗng        | Vùng kéo–thả với hướng dẫn, danh sách tài liệu trống kèm gợi ý mở file      |
-| Đang tải    | Skeleton cho danh sách; spinner/progress khi đang ghi file lớn vào OPFS     |
-| Lỗi         | Thông báo rõ tại vùng thả (sai định dạng, quá dung lượng, ghi OPFS lỗi)     |
-| Ngoại tuyến | Mở/xem tài liệu đã lưu hoạt động bình thường — toàn bộ luồng không gọi mạng |
+| Trạng thái  | Hiển thị gì                                                                                                                                                                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Rỗng        | Vùng kéo–thả với hướng dẫn, danh sách tài liệu trống kèm gợi ý mở file                                                                                                                                                                                 |
+| Đang tải    | Skeleton cho danh sách; spinner/progress khi đang ghi file lớn vào OPFS                                                                                                                                                                                |
+| Lỗi         | Thông báo rõ tại vùng thả (sai định dạng, quá dung lượng, ghi OPFS lỗi)                                                                                                                                                                                |
+| Ngoại tuyến | Mở/xem tài liệu đã lưu hoạt động bình thường trong phiên đã tải app — toàn bộ luồng không gọi mạng. **Giới hạn:** tải lại cứng (hard reload) trang khi đang mất mạng chưa hoạt động — dev server chưa có service worker phục vụ shell ứng dụng offline |
 
 ## 5. Ảnh hưởng tới quyền riêng tư
 
-| Câu hỏi                                                                        | Trả lời                                                                                    |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| Có dữ liệu nào rời khỏi máy người dùng không?                                  | Không — toàn bộ luồng (đọc file, lưu OPFS/IndexedDB, xem PDF) chạy trong trình duyệt       |
-| Nếu có, người dùng xác nhận ở bước nào và thấy thông tin gì?                   | Không áp dụng — feature này không có bước nào gửi dữ liệu lên server                       |
-| Feature này đọc/ghi trạng thái tài liệu (🔒 / ☁️) ra sao?                      | Mọi tài liệu tạo mới ở đây luôn 🔒 Cục bộ; feature không có đường nào set ☁️ Đã tải lên    |
-| Có hoạt động được khi mất mạng không?                                          | Có — toàn bộ, kể cả lần đầu mở app (bundle đã cache) và mở/xem tài liệu đã lưu trước đó    |
-| Có yêu cầu đăng nhập không? Nếu có, phần nào vẫn dùng được khi chưa đăng nhập? | Không yêu cầu đăng nhập — toàn bộ feature dùng được ở trạng thái ẩn danh, khớp `CLAUDE.md` |
+| Câu hỏi                                                                        | Trả lời                                                                                                                                                                  |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Có dữ liệu nào rời khỏi máy người dùng không?                                  | Không — toàn bộ luồng (đọc file, lưu OPFS/IndexedDB, xem PDF) chạy trong trình duyệt                                                                                     |
+| Nếu có, người dùng xác nhận ở bước nào và thấy thông tin gì?                   | Không áp dụng — feature này không có bước nào gửi dữ liệu lên server                                                                                                     |
+| Feature này đọc/ghi trạng thái tài liệu (🔒 / ☁️) ra sao?                      | Mọi tài liệu tạo mới ở đây luôn 🔒 Cục bộ; feature không có đường nào set ☁️ Đã tải lên                                                                                  |
+| Có hoạt động được khi mất mạng không?                                          | Có — trong phiên đã tải app, mở/xem tài liệu đã lưu trước đó không gọi mạng. Chưa hoạt động khi tải lại cứng trang lúc mất mạng (chưa có service worker cache app shell) |
+| Có yêu cầu đăng nhập không? Nếu có, phần nào vẫn dùng được khi chưa đăng nhập? | Không yêu cầu đăng nhập — toàn bộ feature dùng được ở trạng thái ẩn danh, khớp `CLAUDE.md`                                                                               |
 
 ## 6. Ràng buộc kỹ thuật
 
@@ -81,9 +81,9 @@ Người dùng cần mở nhanh một tài liệu trên máy không cài Office,
 
 ## 7. User story
 
-- [ ] [US-5: Mở tài liệu bằng kéo–thả hoặc chọn file](../stories/5_mo_tai_lieu_story.md)
-- [ ] [US-6: Danh sách tài liệu đã mở](../stories/6_danh_sach_tai_lieu_story.md)
-- [ ] [US-7: Xem tài liệu PDF cục bộ](../stories/7_xem_pdf_cuc_bo_story.md)
+- [x] [US-5: Mở tài liệu bằng kéo–thả hoặc chọn file](../stories/5_mo_tai_lieu_story.md)
+- [x] [US-6: Danh sách tài liệu đã mở](../stories/6_danh_sach_tai_lieu_story.md)
+- [x] [US-7: Xem tài liệu PDF cục bộ](../stories/7_xem_pdf_cuc_bo_story.md)
 
 Feature chỉ đóng khi mọi ô ở đây đã tick **và** checklist mục 10 đã chạy hết.
 

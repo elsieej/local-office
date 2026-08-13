@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import * as pdfjsLib from 'pdfjs-dist'
-import type { PDFDocumentLoadingTask, PDFDocumentProxy } from 'pdfjs-dist'
+import type * as PdfjsLib from 'pdfjs-dist'
+import type { PDFDocumentProxy, PDFWorker } from 'pdfjs-dist'
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -14,14 +14,35 @@ import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Skeleton } from '#/components/ui/skeleton'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).href
-
 const MIN_SCALE = 0.5
 const MAX_SCALE = 3
 const SCALE_STEP = 0.25
+
+// pdf.js (qua canvas.js) dùng `DOMMatrix` ở top-level module — chỉ tồn tại
+// trong trình duyệt. Import tĩnh sẽ kéo theo lỗi khi route này render phía
+// server (SSR). Import động, chỉ chạy trong effect (client-only), giữ
+// nguyên một worker dùng chung cho cả phiên — không destroy theo từng lần
+// mở/đóng tài liệu vì pdf.js fetch lại script worker mỗi khi tạo worker
+// mới, nên tạo mới cho từng PDF sẽ đòi mạng lại lúc mất mạng dù trước đó đã
+// xem được. Xem TASK-17.
+let pdfjsLibPromise: Promise<typeof PdfjsLib> | undefined
+let sharedWorker: PDFWorker | undefined
+
+async function getPdfjsLib(): Promise<typeof PdfjsLib> {
+  pdfjsLibPromise ??= import('pdfjs-dist').then((lib) => {
+    lib.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.mjs',
+      import.meta.url,
+    ).href
+    return lib
+  })
+  return pdfjsLibPromise
+}
+
+function getSharedWorker(pdfjsLib: typeof PdfjsLib): PDFWorker {
+  sharedWorker ??= new pdfjsLib.PDFWorker()
+  return sharedWorker
+}
 
 type PdfViewerProps = {
   file: File
@@ -30,7 +51,6 @@ type PdfViewerProps = {
 export default function PdfViewer({ file }: PdfViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const pdfRef = useRef<PDFDocumentProxy | null>(null)
-  const loadingTaskRef = useRef<PDFDocumentLoadingTask | null>(null)
 
   const [pageCount, setPageCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
@@ -48,14 +68,15 @@ export default function PdfViewer({ file }: PdfViewerProps) {
 
     async function load() {
       try {
-        const bytes = await file.arrayBuffer()
-        const loadingTask = pdfjsLib.getDocument({ data: bytes })
-        loadingTaskRef.current = loadingTask
-        const pdf = await loadingTask.promise
-        if (cancelled) {
-          void loadingTask.destroy()
-          return
-        }
+        const [bytes, pdfjsLib] = await Promise.all([
+          file.arrayBuffer(),
+          getPdfjsLib(),
+        ])
+        const pdf = await pdfjsLib.getDocument({
+          data: bytes,
+          worker: getSharedWorker(pdfjsLib),
+        }).promise
+        if (cancelled) return
         pdfRef.current = pdf
         setPageCount(pdf.numPages)
         setCurrentPage(1)
@@ -68,8 +89,6 @@ export default function PdfViewer({ file }: PdfViewerProps) {
     void load()
     return () => {
       cancelled = true
-      void loadingTaskRef.current?.destroy()
-      loadingTaskRef.current = null
       pdfRef.current = null
     }
   }, [file])

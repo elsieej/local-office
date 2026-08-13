@@ -1,6 +1,11 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeftIcon, DownloadIcon, Trash2Icon } from 'lucide-react'
+import {
+  ArrowLeftIcon,
+  DownloadIcon,
+  EyeOffIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert'
 import { Button } from '#/components/ui/button'
 import {
@@ -10,6 +15,13 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '#/components/ui/empty'
 import { Skeleton } from '#/components/ui/skeleton'
 import DocumentKindIcon from '#/components/document-kind-icon'
 import DocumentStateBadge from '#/components/document-state-badge'
@@ -150,6 +162,20 @@ function DocumentDetailPage() {
           <AlertTitle>Không đọc được nội dung PDF</AlertTitle>
           <AlertDescription>Thử tải lại trang.</AlertDescription>
         </Alert>
+      )}
+
+      {!isPdf && (
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <EyeOffIcon />
+            </EmptyMedia>
+            <EmptyTitle>Chưa hỗ trợ xem định dạng này</EmptyTitle>
+            <EmptyDescription>
+              Dùng nút "Tải về" ở trên để mở bằng phần mềm khác trên máy bạn.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       )}
     </main>
   )
