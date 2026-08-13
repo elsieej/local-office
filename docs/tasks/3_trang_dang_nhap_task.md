@@ -22,6 +22,7 @@ Hoàn thiện chế độ đăng nhập của route dùng chung (từ TASK-2) v�
 - [x] Kiểm thử qua `curl` (Origin khớp `BETTER_AUTH_URL`): đăng nhập đúng email/mật khẩu → 200
 - [x] Kiểm thử qua `curl`: sai mật khẩu và email không tồn tại → cả hai đều trả `code: INVALID_EMAIL_OR_PASSWORD`, `message: "Invalid email or password"` giống hệt nhau
 - [x] Trường hợp biên: `submitAuthForm` bọc `try/catch` quanh lời gọi `authClient` — lỗi mạng (fetch reject) rơi vào nhánh `catch`, trả về lỗi chung "An unexpected error occurred" qua `useMutation`, nút submit tự hết trạng thái loading nhờ `authMutation.isPending` (React Query tự quản lý, không còn `finally` thủ công)
+- [x] Kiểm thử qua Playwright MCP (RULE.md §9, trình duyệt thật): đăng ký ở `/login` → vào ngay; đăng xuất → đăng nhập lại đúng → **redirect về `/`**, header hiển thị avatar trên mọi trang; đăng xuất → nhập sai mật khẩu → Alert hiện đúng "Invalid email or password.", form giữ nguyên giá trị đã nhập, nút hết loading
 
 ## Ghi chú
 
@@ -29,4 +30,6 @@ Dùng chung route với TASK-2 (cùng file, hai chế độ đăng nhập/đăng
 
 Refactor sang `useMutation` (TanStack Query) theo yêu cầu bổ sung giữa chừng — xem [TASK-10](10_to_chuc_schemas_va_constants_task.md) cho phần tách `schemas/`/`constants/`. Cả hai gộp chung một PR vì cùng đụng `login.tsx` chưa từng tồn tại trên `main`.
 
-Playwright MCP rớt kết nối liên tục trong lúc làm task này (xem [TASK-9](9_them_not_found_component_task.md)) — phần lớn kiểm thử ở đây dùng `curl` thay thế. Nên chạy lại kiểm thử UI đầy đủ qua Playwright MCP khi có điều kiện, trước khi coi task này chốt hoàn toàn.
+Playwright MCP rớt kết nối liên tục lúc mới làm task này (xem [TASK-9](9_them_not_found_component_task.md)) nên ban đầu phải dùng `curl` thay thế; sau khi kết nối lại đã chạy đủ kiểm thử UI thật, kết quả khớp hoàn toàn với những gì `curl` đã xác nhận trước đó.
+
+Phát hiện thêm (ngoài phạm vi task này, không sửa ở đây): bug khuếch đại console-piping của `@tanstack/devtools-vite` (đã ghi ở TASK-9) không chỉ xảy ra với cảnh báo "notFoundError" mà với **bất kỳ** `console.warn`/`error` nào phía server — ví dụ Better Auth tự log "Invalid password" mỗi lần đăng nhập sai cũng bị khuếch đại. `notFoundComponent` ở TASK-9 chỉ chặn được một nguồn cụ thể, chưa phải sửa gốc. Không ảnh hưởng người dùng thật (chỉ lộ trong console dev), nhưng đáng cân nhắc báo lên upstream `@tanstack/devtools-vite` nếu tiếp tục gây phiền khi kiểm thử.
