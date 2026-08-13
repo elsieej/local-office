@@ -43,6 +43,7 @@ Kéo–thả, chọn từ máy, hoặc mở nhiều file cùng lúc. Ở bước
 | Bảng tính        | `.xlsx`, `.xls` |  ✓  |  ✓  |
 | Trình chiếu      | `.pptx`, `.ppt` |  ✓  |  ✓  |
 | Tài liệu cố định | `.pdf`          |  ✓  |  —  |
+| Văn bản thuần    | `.txt`, `.md`   |  ✓  |  ✓  |
 
 ### 👁️ Xem tài liệu (View)
 
