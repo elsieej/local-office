@@ -14,11 +14,11 @@
 
 ## Mong muốn
 
-- [ ] Danh sách tài liệu: file `.docx` có 2 hành động riêng "Xem" và "Sửa" (không còn dùng chung một nút mở)
-- [ ] Bấm "Xem" → trang chi tiết khởi tạo `DocEditor` ở `editorConfig.mode: 'view'`, nội dung hiện đúng như mở bằng Word, không sửa được
-- [ ] Bấm "Sửa" → trang chi tiết khởi tạo `DocEditor` ở `mode: 'edit'`, gõ/sửa được nội dung
-- [ ] Đang ở mode Xem, có nút "Chuyển sang Sửa" ngay trên trang chi tiết → huỷ editor cũ, khởi tạo lại ở mode edit, không cần quay lại danh sách
-- [ ] Đang ở mode Sửa có thay đổi chưa lưu, người dùng rời trang (quay lại danh sách, chuyển sang mode Xem, đóng tab) → xác nhận qua `window.confirm` trước khi huỷ, giống mẫu đã dùng ở nút Xoá
+- [x] Danh sách tài liệu: file `.docx` có 2 hành động riêng "Xem" và "Sửa" (không còn dùng chung một nút mở)
+- [x] Bấm "Xem" → trang chi tiết khởi tạo `DocEditor` ở mode view (qua `document.permissions.edit: false`, không dùng `editorConfig.mode` — xem Ghi chú TASK-21), nội dung hiện đúng như mở bằng Word, không sửa được
+- [x] Bấm "Sửa" → trang chi tiết khởi tạo `DocEditor` ở mode edit, gõ/sửa được nội dung
+- [x] Đang ở mode Xem, có nút "Chuyển sang Sửa" ngay trên trang chi tiết → huỷ editor cũ, khởi tạo lại ở mode edit, không cần quay lại danh sách
+- [x] Đang ở mode Sửa có thay đổi chưa lưu, người dùng rời trang (quay lại danh sách, chuyển sang mode Xem, đóng tab) → xác nhận qua `window.confirm` trước khi huỷ, giống mẫu đã dùng ở nút Xoá
 - [ ] Sửa xong, bấm lưu → file cập nhật lại trong OPFS (vẫn 🔒 Cục bộ), không có request nào gửi nội dung ra ngoài máy
 - [ ] Tải về sau khi sửa → file `.docx` mở được bằng Microsoft Office, giữ đúng nội dung đã sửa (khứ hồi thật, không mất định dạng)
 - [ ] `browser_network_requests` trong suốt luồng xem/sửa/lưu: không có request nào ra ngoài domain LocalOffice (kế thừa câu hỏi mở từ US-8 — đo được thật lần đầu ở story này vì cần editor chạy thật)
@@ -31,7 +31,7 @@
 - [x] [TASK-19: Vendor pipeline asset ONLYOFFICE + `x2t.wasm`](../tasks/19_vendor_pipeline_onlyoffice_task.md) · #38
 - [x] [TASK-20: LICENSE AGPL-3.0 + trang "Tải mã nguồn"](../tasks/20_license_agpl_trang_nguon_task.md) · #41
 - [x] [TASK-21: Mở `.docx` ở mode Xem qua `DocEditor`](../tasks/21_mo_docx_mode_xem_task.md) · #43
-- [ ] TASK-22: 2 nút Xem/Sửa, chuyển mode, xác nhận thay đổi chưa lưu — chưa viết task doc
+- [x] [TASK-22: 2 nút Xem/Sửa, chuyển mode, xác nhận thay đổi chưa lưu](../tasks/22_nut_xem_sua_chuyen_mode_task.md) · #45
 - [ ] TASK-23: Lưu khứ hồi vào OPFS + đo network payload/egress thật — chưa viết task doc
 
 ## Ghi chú

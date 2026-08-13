@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useBlocker } from '@tanstack/react-router'
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert'
 import { Skeleton } from '#/components/ui/skeleton'
 import { EditorServer } from '#/lib/onlyoffice/editor-server'
@@ -32,20 +33,35 @@ type OnlyofficeEditorProps = {
   /** Đuôi file không có dấu chấm, vd "docx" — dùng làm input cho x2t. */
   fileType: string
   title: string
+  mode: 'view' | 'edit'
 }
 
 export default function OnlyofficeEditor({
   file,
   fileType,
   title,
+  mode,
 }: OnlyofficeEditorProps) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const isDirtyRef = useRef(false)
+
+  useBlocker({
+    shouldBlockFn: () => {
+      if (!isDirtyRef.current) return false
+      return !window.confirm(
+        'Tài liệu có thay đổi chưa lưu. Rời trang và bỏ các thay đổi này?',
+      )
+    },
+  })
 
   useEffect(() => {
     let cancelled = false
     let editor: DocEditorInstance | null = null
     const server = new EditorServer()
+    isDirtyRef.current = false
+    setStatus('loading')
+    setErrorMessage(null)
 
     function fail(message: string, err?: unknown) {
       if (cancelled) return
@@ -116,7 +132,7 @@ export default function OnlyofficeEditor({
           title: doc.title,
           url: doc.url,
           permissions: {
-            edit: false,
+            edit: mode === 'edit',
             chat: false,
             rename: false,
             protect: false,
@@ -141,6 +157,18 @@ export default function OnlyofficeEditor({
           },
           onError: (e: unknown) =>
             fail('ONLYOFFICE báo lỗi khi mở tài liệu.', e),
+          onDocumentStateChange: (e: { data: boolean }) => {
+            if (e.data) isDirtyRef.current = true
+          },
+          onSaveDocument: () => {
+            isDirtyRef.current = false
+          },
+          onSave: () => {
+            isDirtyRef.current = false
+          },
+          writeFile: () => {
+            isDirtyRef.current = false
+          },
         },
         type: 'desktop',
         width: '100%',
@@ -197,7 +225,7 @@ export default function OnlyofficeEditor({
       editor?.destroyEditor()
       server.destroy()
     }
-  }, [file, fileType, title])
+  }, [file, fileType, title, mode])
 
   if (status === 'error') {
     return (

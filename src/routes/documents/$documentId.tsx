@@ -3,7 +3,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   ArrowLeftIcon,
   DownloadIcon,
+  EyeIcon,
   EyeOffIcon,
+  PencilIcon,
   Trash2Icon,
 } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert'
@@ -38,8 +40,15 @@ import {
   openDocument,
 } from '#/lib/documents/store'
 
+type DocumentDetailSearch = {
+  mode: 'view' | 'edit'
+}
+
 export const Route = createFileRoute('/documents/$documentId')({
   component: DocumentDetailPage,
+  validateSearch: (search: Record<string, unknown>): DocumentDetailSearch => ({
+    mode: search.mode === 'edit' ? 'edit' : 'view',
+  }),
 })
 
 async function downloadDocument(id: string, name: string) {
@@ -65,6 +74,7 @@ function BackButton() {
 
 function DocumentDetailPage() {
   const { documentId } = Route.useParams()
+  const { mode } = Route.useSearch()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -142,6 +152,36 @@ function DocumentDetailPage() {
           <DocumentStateBadge state={doc.state} />
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
+          {isWord && mode === 'view' && (
+            <Button
+              variant="outline"
+              render={
+                <Link
+                  to="/documents/$documentId"
+                  params={{ documentId: doc.id }}
+                  search={{ mode: 'edit' }}
+                />
+              }
+            >
+              <PencilIcon />
+              Chuyển sang Sửa
+            </Button>
+          )}
+          {isWord && mode === 'edit' && (
+            <Button
+              variant="outline"
+              render={
+                <Link
+                  to="/documents/$documentId"
+                  params={{ documentId: doc.id }}
+                  search={{ mode: 'view' }}
+                />
+              }
+            >
+              <EyeIcon />
+              Chuyển sang Xem
+            </Button>
+          )}
           <Button onClick={() => void downloadDocument(doc.id, doc.name)}>
             <DownloadIcon />
             Tải về
@@ -160,10 +200,18 @@ function DocumentDetailPage() {
       {isPdf && fileQuery.data && <PdfViewer file={fileQuery.data} />}
 
       {isWord && fileQuery.data && (
+        // key={mode}: DocEditor tự chèn/thao tác DOM bên trong container
+        // (iframe "frameEditor") ngoài tầm kiểm soát của React — để React
+        // "reconcile" lại đúng subtree đó khi đổi mode (thay vì unmount
+        // hẳn) gây lỗi "insertBefore... not a child of this node" vì
+        // React và DocEditor cùng tranh thay đổi DOM. `key` ép React
+        // unmount/mount lại toàn bộ, luôn có DOM sạch cho DocEditor mới.
         <OnlyofficeEditor
+          key={mode}
           file={fileQuery.data}
           fileType={doc.extension.slice(1)}
           title={doc.name}
+          mode={mode}
         />
       )}
 
