@@ -24,11 +24,11 @@ Người dùng cần mở nhanh một tài liệu trên máy không cài Office,
 - Lưu bytes tài liệu cục bộ (OPFS) + metadata (tên, loại, dung lượng, thời gian mở) trong IndexedDB — đúng theo `TECHSTACK.md` §5
 - Danh sách tài liệu đã mở, hiển thị trạng thái 🔒 Cục bộ, mở lại, xoá cục bộ
 - Xem tài liệu `.pdf` ngay trong trình duyệt: điều hướng trang, phóng to/thu nhỏ, tìm kiếm nội dung, hoạt động ngoại tuyến
-- Chấp nhận chọn/thả mọi định dạng liệt kê ở `CLAUDE.md` (`.docx` `.doc` `.xlsx` `.xls` `.pptx` `.ppt` `.pdf`) — validate đuôi file, lưu được, hiện trong danh sách
+- Chấp nhận chọn/thả mọi định dạng liệt kê ở `CLAUDE.md` (`.docx` `.doc` `.xlsx` `.xls` `.pptx` `.ppt` `.pdf` `.txt` `.md`) — validate đuôi file, lưu được, hiện trong danh sách
 
 **Ngoài phạm vi**
 
-- Xem/sửa `.docx` `.xlsx` `.pptx` `.doc` `.xls` `.ppt` — cần chọn engine tài liệu khứ hồi trước (xem `TECHSTACK.md` §5); những định dạng này mở/lưu/liệt kê được nhưng nhấn "xem" sẽ báo rõ "chưa hỗ trợ xem định dạng này", không giả vờ hiển thị nội dung
+- Xem/sửa `.docx` `.xlsx` `.pptx` `.doc` `.xls` `.ppt` `.txt` `.md` — cần chọn engine tài liệu khứ hồi trước cho nhóm Office (xem `TECHSTACK.md` §5); `.txt`/`.md` không vướng ràng buộc khứ hồi nhưng viewer chưa dựng trong feature này. Cả nhóm mở/lưu/liệt kê được nhưng nhấn "xem" sẽ báo rõ "chưa hỗ trợ xem định dạng này", không giả vờ hiển thị nội dung
 - Tải lên đám mây, đăng nhập, chia sẻ liên kết — feature riêng, phụ thuộc object storage chưa chọn
 - Đổi tên tài liệu, lọc theo trạng thái, "xoá tất cả" — mở rộng của khu vực quản lý, để lại cho feature quản lý tài liệu đầy đủ
 - Chỉnh sửa PDF (PDF theo `CLAUDE.md` chỉ Xem, không Sửa)

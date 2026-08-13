@@ -10,6 +10,8 @@ export const DOCUMENT_EXTENSION_KIND = {
   '.pptx': 'powerpoint',
   '.ppt': 'powerpoint',
   '.pdf': 'pdf',
+  '.txt': 'text',
+  '.md': 'markdown',
 } as const
 
 export type DocumentExtension = keyof typeof DOCUMENT_EXTENSION_KIND
