@@ -11,10 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
 
-const DEMO_LINKS = [
-  { to: '/demo/drizzle', label: 'Drizzle' },
-  { to: '/demo/better-auth', label: 'Better Auth' },
-] as const
+const DEMO_LINKS = [{ to: '/demo/drizzle', label: 'Drizzle' }] as const
 
 export default function Header() {
   return (

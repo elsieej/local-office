@@ -143,6 +143,8 @@ TanStack Router suy ra type từ cây route. Annotate tay giá trị đã infer 
 
 - **Import nội bộ dùng `#/`**: `import { auth } from '#/lib/auth'`. Không dùng `../../..`, cũng không dùng `@/` (có trong `tsconfig.json` nhưng không code nào dùng).
 - Thứ tự import: ESLint đã tắt `import/order`, nên không có luật cứng. Giữ nhóm tự nhiên: thư viện ngoài → nội bộ → type.
+- **Schema `zod` dùng chung** đặt ở `src/schemas/<domain>.ts` (vd `src/schemas/auth.ts`), không khai báo thẳng trong route/component. Route dùng lại bằng `import { SIGN_IN_SCHEMA } from '#/schemas/auth'`.
+- **`src/constants/`** chứa hằng số cấu hình dùng chung, mỗi mối quan tâm một file — vd `error-response.ts` (mã lỗi + thông điệp API bên ngoài, qua `AUTH_ERROR_CODE`/`AUTH_ERROR_MESSAGE`), sau này thêm `theming.ts`, `app-config.ts`… Không so sánh chuỗi mã lỗi thô rải rác trong component.
 
 ---
 
