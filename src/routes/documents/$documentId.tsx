@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
@@ -11,13 +12,6 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert'
 import { Button } from '#/components/ui/button'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '#/components/ui/card'
-import {
   Empty,
   EmptyDescription,
   EmptyHeader,
@@ -29,10 +23,6 @@ import DocumentKindIcon from '#/components/document-kind-icon'
 import DocumentStateBadge from '#/components/document-state-badge'
 import OnlyofficeEditor from '#/components/onlyoffice-editor'
 import PdfViewer from '#/components/pdf-viewer'
-import {
-  formatDocumentOpenedAt,
-  formatDocumentSize,
-} from '#/lib/documents/format'
 import {
   DOCUMENTS_QUERY_KEY,
   deleteDocument,
@@ -63,12 +53,22 @@ async function downloadDocument(id: string, name: string) {
   URL.revokeObjectURL(url)
 }
 
-function BackButton() {
+// Route này tự vẽ thanh trên riêng (không dùng Header của site — xem
+// __root.tsx) để chừa gần hết viewport cho nội dung tài liệu, nhất là
+// editor ONLYOFFICE (đo chiều cao còn lại bằng JS, xem onlyoffice-editor.tsx).
+function TopBar({ children }: { children?: React.ReactNode }) {
   return (
-    <Button render={<Link to="/" />} variant="ghost" className="w-fit">
-      <ArrowLeftIcon />
-      Quay lại
-    </Button>
+    <header className="bg-background sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b px-4 py-2">
+      <Button
+        render={<Link to="/" />}
+        variant="ghost"
+        size="icon"
+        aria-label="Quay lại danh sách tài liệu"
+      >
+        <ArrowLeftIcon />
+      </Button>
+      {children}
+    </header>
   )
 }
 
@@ -99,32 +99,49 @@ function DocumentDetailPage() {
     },
   })
 
+  // Trang này không dùng <Header/> của site (xem __root.tsx) nên tên file
+  // trong tab trình duyệt là nơi duy nhất còn lại để nhận ra tài liệu đang
+  // mở — khôi phục lại title mặc định khi rời trang.
+  const documentName = documentQuery.data?.name
+  useEffect(() => {
+    if (!documentName) return
+    const previousTitle = document.title
+    document.title = documentName
+    return () => {
+      document.title = previousTitle
+    }
+  }, [documentName])
+
   if (documentQuery.isPending) {
     return (
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pt-14 pb-8">
-        <BackButton />
-        <Skeleton className="h-40 w-full" />
-      </main>
+      <div className="flex min-h-svh flex-col">
+        <TopBar />
+        <main className="flex-1 px-4 py-3">
+          <Skeleton className="h-40 w-full" />
+        </main>
+      </div>
     )
   }
 
   if (documentQuery.isError || !documentQuery.data) {
     return (
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pt-14 pb-8">
-        <BackButton />
-        <Alert variant="destructive">
-          <AlertTitle>
-            {documentQuery.isError
-              ? 'Không đọc được tài liệu'
-              : 'Không tìm thấy tài liệu'}
-          </AlertTitle>
-          <AlertDescription>
-            {documentQuery.isError
-              ? 'Thử tải lại trang.'
-              : 'Tài liệu này có thể đã bị xoá hoặc chưa từng tồn tại trên thiết bị này.'}
-          </AlertDescription>
-        </Alert>
-      </main>
+      <div className="flex min-h-svh flex-col">
+        <TopBar />
+        <main className="flex-1 px-4 py-3">
+          <Alert variant="destructive">
+            <AlertTitle>
+              {documentQuery.isError
+                ? 'Không đọc được tài liệu'
+                : 'Không tìm thấy tài liệu'}
+            </AlertTitle>
+            <AlertDescription>
+              {documentQuery.isError
+                ? 'Thử tải lại trang.'
+                : 'Tài liệu này có thể đã bị xoá hoặc chưa từng tồn tại trên thiết bị này.'}
+            </AlertDescription>
+          </Alert>
+        </main>
+      </div>
     )
   }
 
@@ -136,25 +153,19 @@ function DocumentDetailPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 pt-14 pb-8">
-      <BackButton />
-      <Card>
-        <CardHeader>
-          <DocumentKindIcon
-            kind={doc.kind}
-            className="text-muted-foreground size-6"
-          />
-          <CardTitle className="text-xl">{doc.name}</CardTitle>
-          <CardDescription>
-            {formatDocumentSize(doc.size)} ·{' '}
-            {formatDocumentOpenedAt(doc.openedAt)}
-          </CardDescription>
-          <DocumentStateBadge state={doc.state} />
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
+    <div className="flex min-h-svh flex-col">
+      <TopBar>
+        <DocumentKindIcon
+          kind={doc.kind}
+          className="text-muted-foreground size-5 shrink-0"
+        />
+        <h1 className="truncate text-base font-medium">{doc.name}</h1>
+        <DocumentStateBadge state={doc.state} />
+        <div className="ml-auto flex flex-wrap gap-2">
           {isWord && mode === 'view' && (
             <Button
               variant="outline"
+              size="sm"
               render={
                 <Link
                   to="/documents/$documentId"
@@ -170,6 +181,7 @@ function DocumentDetailPage() {
           {isWord && mode === 'edit' && (
             <Button
               variant="outline"
+              size="sm"
               render={
                 <Link
                   to="/documents/$documentId"
@@ -182,11 +194,15 @@ function DocumentDetailPage() {
               Chuyển sang Xem
             </Button>
           )}
-          <Button onClick={() => void downloadDocument(doc.id, doc.name)}>
+          <Button
+            size="sm"
+            onClick={() => void downloadDocument(doc.id, doc.name)}
+          >
             <DownloadIcon />
             Tải về
           </Button>
           <Button
+            size="sm"
             variant="destructive"
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
@@ -194,50 +210,63 @@ function DocumentDetailPage() {
             <Trash2Icon />
             Xoá
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </TopBar>
 
-      {isPdf && fileQuery.data && <PdfViewer file={fileQuery.data} />}
+      <main className="flex min-h-0 flex-1 flex-col">
+        {isPdf && fileQuery.data && (
+          <div className="px-4 py-3">
+            <PdfViewer file={fileQuery.data} />
+          </div>
+        )}
 
-      {isWord && fileQuery.data && (
-        // key={mode}: DocEditor tự chèn/thao tác DOM bên trong container
-        // (iframe "frameEditor") ngoài tầm kiểm soát của React — để React
-        // "reconcile" lại đúng subtree đó khi đổi mode (thay vì unmount
-        // hẳn) gây lỗi "insertBefore... not a child of this node" vì
-        // React và DocEditor cùng tranh thay đổi DOM. `key` ép React
-        // unmount/mount lại toàn bộ, luôn có DOM sạch cho DocEditor mới.
-        <OnlyofficeEditor
-          key={mode}
-          file={fileQuery.data}
-          fileType={doc.extension.slice(1)}
-          title={doc.name}
-          mode={mode}
-        />
-      )}
+        {isWord && fileQuery.data && (
+          // key={mode}: DocEditor tự chèn/thao tác DOM bên trong container
+          // (iframe "frameEditor") ngoài tầm kiểm soát của React — để React
+          // "reconcile" lại đúng subtree đó khi đổi mode (thay vì unmount
+          // hẳn) gây lỗi "insertBefore... not a child of this node" vì
+          // React và DocEditor cùng tranh thay đổi DOM. `key` ép React
+          // unmount/mount lại toàn bộ, luôn có DOM sạch cho DocEditor mới.
+          <OnlyofficeEditor
+            key={mode}
+            file={fileQuery.data}
+            fileType={doc.extension.slice(1)}
+            title={doc.name}
+            mode={mode}
+          />
+        )}
 
-      {(isPdf || isWord) && fileQuery.isPending && (
-        <Skeleton className="h-96 w-full" />
-      )}
-      {(isPdf || isWord) && fileQuery.isError && (
-        <Alert variant="destructive">
-          <AlertTitle>Không đọc được nội dung tài liệu</AlertTitle>
-          <AlertDescription>Thử tải lại trang.</AlertDescription>
-        </Alert>
-      )}
+        {(isPdf || isWord) && fileQuery.isPending && (
+          <div className="px-4 py-3">
+            <Skeleton className="h-96 w-full" />
+          </div>
+        )}
+        {(isPdf || isWord) && fileQuery.isError && (
+          <div className="px-4 py-3">
+            <Alert variant="destructive">
+              <AlertTitle>Không đọc được nội dung tài liệu</AlertTitle>
+              <AlertDescription>Thử tải lại trang.</AlertDescription>
+            </Alert>
+          </div>
+        )}
 
-      {!isPdf && !isWord && (
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <EyeOffIcon />
-            </EmptyMedia>
-            <EmptyTitle>Chưa hỗ trợ xem định dạng này</EmptyTitle>
-            <EmptyDescription>
-              Dùng nút "Tải về" ở trên để mở bằng phần mềm khác trên máy bạn.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      )}
-    </main>
+        {!isPdf && !isWord && (
+          <div className="flex flex-1 items-center justify-center px-4 py-3">
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <EyeOffIcon />
+                </EmptyMedia>
+                <EmptyTitle>Chưa hỗ trợ xem định dạng này</EmptyTitle>
+                <EmptyDescription>
+                  Dùng nút "Tải về" ở trên để mở bằng phần mềm khác trên máy
+                  bạn.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          </div>
+        )}
+      </main>
+    </div>
   )
 }
