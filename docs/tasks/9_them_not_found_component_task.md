@@ -1,8 +1,8 @@
 # TASK-9: Thêm `notFoundComponent` cho root route
 
 **Story:** Không thuộc user story nào — hotfix phát hiện khi kiểm thử [TASK-3](3_trang_dang_nhap_task.md) qua Playwright MCP.
-**Issue:** #TBD · **Nhánh:** `fix/root-not-found-component`
-**Trạng thái:** 🟡 Đang làm
+**Issue:** #12 · **Nhánh:** `fix/root-not-found-component`
+**Trạng thái:** 🔵 Chờ review
 
 ---
 
