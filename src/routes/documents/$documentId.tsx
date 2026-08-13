@@ -13,6 +13,7 @@ import {
 import { Skeleton } from '#/components/ui/skeleton'
 import DocumentKindIcon from '#/components/document-kind-icon'
 import DocumentStateBadge from '#/components/document-state-badge'
+import PdfViewer from '#/components/pdf-viewer'
 import {
   formatDocumentOpenedAt,
   formatDocumentSize,
@@ -57,6 +58,13 @@ function DocumentDetailPage() {
   const documentQuery = useQuery({
     queryKey: [...DOCUMENTS_QUERY_KEY, documentId],
     queryFn: () => getDocument(documentId),
+  })
+
+  const isPdf = documentQuery.data?.kind === 'pdf'
+  const fileQuery = useQuery({
+    queryKey: [...DOCUMENTS_QUERY_KEY, documentId, 'bytes'],
+    queryFn: () => openDocument(documentId),
+    enabled: isPdf,
   })
 
   const deleteMutation = useMutation({
@@ -104,7 +112,7 @@ function DocumentDetailPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pt-14 pb-8">
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 pt-14 pb-8">
       <BackButton />
       <Card>
         <CardHeader>
@@ -134,6 +142,15 @@ function DocumentDetailPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {isPdf && fileQuery.data && <PdfViewer file={fileQuery.data} />}
+      {isPdf && fileQuery.isPending && <Skeleton className="h-96 w-full" />}
+      {isPdf && fileQuery.isError && (
+        <Alert variant="destructive">
+          <AlertTitle>Không đọc được nội dung PDF</AlertTitle>
+          <AlertDescription>Thử tải lại trang.</AlertDescription>
+        </Alert>
+      )}
     </main>
   )
 }

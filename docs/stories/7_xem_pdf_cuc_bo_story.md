@@ -21,7 +21,7 @@
 
 ## Task
 
-- [ ] [TASK-16: Tích hợp pdf.js — trang xem PDF](../tasks/16_pdf_viewer_task.md) · #TBD
+- [ ] [TASK-16: Tích hợp pdf.js — trang xem PDF](../tasks/16_pdf_viewer_task.md) · #31
 - [ ] [TASK-17: Placeholder định dạng chưa hỗ trợ + kiểm thử ngoại tuyến](../tasks/17_placeholder_ngoai_tuyen_task.md) · #TBD
 
 ## Xong khi
