@@ -3,7 +3,7 @@
 > Dự án được xây bằng gì, mỗi mảnh nối dây ở đâu.
 > Xem [`../CLAUDE.md`](../CLAUDE.md) để biết sản phẩm này _là gì_, [`ARCHITECTURE.md`](ARCHITECTURE.md) để biết tài liệu đi qua những trạng thái và ranh giới nào.
 
-**Hiện trạng:** `src/` là scaffold `create-tsrouter-app` (32 file, ba route demo, một bảng `todos`) đã chuyển giao diện sang shadcn/ui. Chưa có code nào liên quan tới tài liệu Office.
+**Hiện trạng:** `src/` là scaffold `create-tsrouter-app` (32 file, ba route demo, một bảng `todos`) đã chuyển giao diện sang shadcn/ui. Đăng nhập/tài khoản (feature 1) đã xong. Lớp lưu trữ tài liệu cục bộ (`src/lib/documents/`) đã có — xem `src/lib/documents/`; chưa có engine xem/sửa Office thật (docx/xlsx/pptx).
 
 ---
 
@@ -11,38 +11,39 @@
 
 Phiên bản là **range khai báo** trong `package.json`.
 
-| Hạng mục                 | Gói npm                                                | Phiên bản                      | Vai trò                                                                     |
-| ------------------------ | ------------------------------------------------------ | ------------------------------ | --------------------------------------------------------------------------- |
-| Meta-framework           | `@tanstack/react-start`                                | `latest`                       | SSR, server function, server route                                          |
-| Routing                  | `@tanstack/react-router`                               | `latest`                       | Định tuyến theo file, type-safe                                             |
-| Sinh route               | `@tanstack/router-cli`                                 | `^1.132.0`                     | `tsr generate` → `src/routeTree.gen.ts`                                     |
-| UI                       | `react` · `react-dom`                                  | `^19.2.0`                      | Thư viện giao diện                                                          |
-| Build                    | `vite`                                                 | `^8.0.0`                       | Dev server, bundler                                                         |
-| Build (plugin)           | `@vitejs/plugin-react`                                 | `^6.0.1`                       | Fast Refresh, JSX transform                                                 |
-| CSS                      | `tailwindcss` `@tailwindcss/vite`                      | `^4.1.18`                      | Utility CSS, design token trong `src/styles.css`                            |
-| CSS (typography)         | `@tailwindcss/typography`                              | `^0.5.16`                      | Style cho nội dung dạng văn bản                                             |
-| CSS (animation)          | `tw-animate-css`                                       | `^1.4.0`                       | Keyframe cho component shadcn                                               |
-| Component UI             | `shadcn` (CLI)                                         | `^4.17.0`                      | Sinh mã vào `src/components/ui/`, không phải runtime                        |
-| Primitive                | `@base-ui/react`                                       | `^1.7.0`                       | Nền không style của shadcn — dùng prop `render`                             |
-| Icon                     | `lucide-react`                                         | `^1.31.0`                      | Bộ icon mặc định của preset                                                 |
-| Class helper             | `clsx` · `tailwind-merge` · `class-variance-authority` | `^2.1.1` · `^3.6.0` · `^0.7.1` | `cn()` trong `src/lib/utils.ts`, variant component                          |
-| Kiểm tra dữ liệu         | `zod`                                                  | `^4.4.3`                       | Schema cho search param, server function, form                              |
-| Auth                     | `better-auth`                                          | `^1.5.3`                       | Email/password, session cookie                                              |
-| Data fetching            | `@tanstack/react-query`                                | `^5.101.4`                     | `useMutation`/`useQuery`, `QueryClient` tạo per-request trong `getRouter()` |
-| Data fetching (devtools) | `@tanstack/react-query-devtools`                       | `^5.101.4`                     | Panel debug trong `__root.tsx`, gộp cùng `TanStackDevtools`                 |
-| ORM                      | `drizzle-orm`                                          | `^0.45.1`                      | Truy vấn có kiểu                                                            |
-| Migration                | `drizzle-kit`                                          | `^0.31.9`                      | `db:generate` · `db:migrate` · `db:studio`                                  |
-| CSDL                     | PostgreSQL qua `pg`                                    | `^8.16.3`                      | Metadata, bảng auth                                                         |
-| Ngôn ngữ                 | `typescript`                                           | `^6.0.2`                       | `strict`, `moduleResolution: bundler`                                       |
-| Lint                     | `eslint`                                               | `^9.20.0`                      | Kiểm tra mã                                                                 |
-| Lint (cấu hình)          | `@tanstack/eslint-config`                              | `latest`                       | Bộ rule nền                                                                 |
-| Định dạng mã             | `prettier`                                             | `^3.8.1`                       | `semi: false`, `singleQuote`, `trailingComma: all`                          |
-| Devtools                 | `@tanstack/react-devtools`                             | `latest`                       | Panel debug trong `__root.tsx`                                              |
-| Devtools (build)         | `@tanstack/devtools-vite`                              | `latest`                       | Source inspection, console piping                                           |
-| Env                      | `dotenv` · `tsx`                                       | `^17.3.1`                      | Nạp `.env` cho script Drizzle                                               |
-| Git hook                 | `husky`                                                | `^9.1.7`                       | Cài hook `pre-commit` · `commit-msg` vào `.husky/`                          |
-| Lint khi commit          | `lint-staged`                                          | `^17.3.0`                      | Prettier + ESLint chỉ trên file đã stage                                    |
-| Lint commit msg          | `@commitlint/cli` · `config-conventional`              | `^21.2.1` · `^21.2.0`          | Ép chuẩn Conventional Commits                                               |
+| Hạng mục                 | Gói npm                                                | Phiên bản                      | Vai trò                                                                                  |
+| ------------------------ | ------------------------------------------------------ | ------------------------------ | ---------------------------------------------------------------------------------------- |
+| Meta-framework           | `@tanstack/react-start`                                | `latest`                       | SSR, server function, server route                                                       |
+| Routing                  | `@tanstack/react-router`                               | `latest`                       | Định tuyến theo file, type-safe                                                          |
+| Sinh route               | `@tanstack/router-cli`                                 | `^1.132.0`                     | `tsr generate` → `src/routeTree.gen.ts`                                                  |
+| UI                       | `react` · `react-dom`                                  | `^19.2.0`                      | Thư viện giao diện                                                                       |
+| Build                    | `vite`                                                 | `^8.0.0`                       | Dev server, bundler                                                                      |
+| Build (plugin)           | `@vitejs/plugin-react`                                 | `^6.0.1`                       | Fast Refresh, JSX transform                                                              |
+| CSS                      | `tailwindcss` `@tailwindcss/vite`                      | `^4.1.18`                      | Utility CSS, design token trong `src/styles.css`                                         |
+| CSS (typography)         | `@tailwindcss/typography`                              | `^0.5.16`                      | Style cho nội dung dạng văn bản                                                          |
+| CSS (animation)          | `tw-animate-css`                                       | `^1.4.0`                       | Keyframe cho component shadcn                                                            |
+| Component UI             | `shadcn` (CLI)                                         | `^4.17.0`                      | Sinh mã vào `src/components/ui/`, không phải runtime                                     |
+| Primitive                | `@base-ui/react`                                       | `^1.7.0`                       | Nền không style của shadcn — dùng prop `render`                                          |
+| Icon                     | `lucide-react`                                         | `^1.31.0`                      | Bộ icon mặc định của preset                                                              |
+| Class helper             | `clsx` · `tailwind-merge` · `class-variance-authority` | `^2.1.1` · `^3.6.0` · `^0.7.1` | `cn()` trong `src/lib/utils.ts`, variant component                                       |
+| Kiểm tra dữ liệu         | `zod`                                                  | `^4.4.3`                       | Schema cho search param, server function, form                                           |
+| Auth                     | `better-auth`                                          | `^1.5.3`                       | Email/password, session cookie                                                           |
+| Data fetching            | `@tanstack/react-query`                                | `^5.101.4`                     | `useMutation`/`useQuery`, `QueryClient` tạo per-request trong `getRouter()`              |
+| Data fetching (devtools) | `@tanstack/react-query-devtools`                       | `^5.101.4`                     | Panel debug trong `__root.tsx`, gộp cùng `TanStackDevtools`                              |
+| ORM                      | `drizzle-orm`                                          | `^0.45.1`                      | Truy vấn có kiểu                                                                         |
+| Migration                | `drizzle-kit`                                          | `^0.31.9`                      | `db:generate` · `db:migrate` · `db:studio`                                               |
+| CSDL                     | PostgreSQL qua `pg`                                    | `^8.16.3`                      | Metadata, bảng auth                                                                      |
+| Ngôn ngữ                 | `typescript`                                           | `^6.0.2`                       | `strict`, `moduleResolution: bundler`                                                    |
+| Lint                     | `eslint`                                               | `^9.20.0`                      | Kiểm tra mã                                                                              |
+| Lint (cấu hình)          | `@tanstack/eslint-config`                              | `latest`                       | Bộ rule nền                                                                              |
+| Định dạng mã             | `prettier`                                             | `^3.8.1`                       | `semi: false`, `singleQuote`, `trailingComma: all`                                       |
+| Devtools                 | `@tanstack/react-devtools`                             | `latest`                       | Panel debug trong `__root.tsx`                                                           |
+| Devtools (build)         | `@tanstack/devtools-vite`                              | `latest`                       | Source inspection, console piping                                                        |
+| Env                      | `dotenv` · `tsx`                                       | `^17.3.1`                      | Nạp `.env` cho script Drizzle                                                            |
+| Lưu trữ cục bộ           | `idb`                                                  | `^8.0.3`                       | Wrapper Promise cho IndexedDB — metadata tài liệu, `src/lib/documents/metadata-store.ts` |
+| Git hook                 | `husky`                                                | `^9.1.7`                       | Cài hook `pre-commit` · `commit-msg` vào `.husky/`                                       |
+| Lint khi commit          | `lint-staged`                                          | `^17.3.0`                      | Prettier + ESLint chỉ trên file đã stage                                                 |
+| Lint commit msg          | `@commitlint/cli` · `config-conventional`              | `^21.2.1` · `^21.2.0`          | Ép chuẩn Conventional Commits                                                            |
 
 **Package manager:** npm (`package-lock.json`, `.cta.json → packageManager: npm`). Khối `"pnpm"` còn sót trong `package.json` là tàn dư của scaffold.
 
@@ -79,11 +80,12 @@ Phiên bản là **range khai báo** trong `package.json`.
 src/
 ├── components/          header · footer · theme-toggle
 │   └── ui/              shadcn sinh ra — sửa được, nhưng CLI sẽ ghi đè khi nâng cấp
-├── constants/            hằng số dùng chung (mã lỗi, theming, app config…)
+├── constants/            hằng số dùng chung (mã lỗi, định dạng tài liệu, theming, app config…)
 ├── db/                  index.ts (drizzle client) · schema.ts
 ├── integrations/
 │   └── better-auth/     header-user.tsx
 ├── lib/                 auth.ts (server) · auth-client.ts (client) · utils.ts (`cn`)
+│   └── documents/       lưu trữ tài liệu cục bộ — store.ts (API cấp cao) · opfs-store.ts · metadata-store.ts · types.ts · errors.ts
 ├── routes/              định tuyến theo file
 │   ├── __root.tsx           shell HTML + devtools + script chặn FOUC + notFoundComponent
 │   ├── index.tsx            trang chủ (còn nội dung scaffold)
@@ -125,11 +127,11 @@ Không có script `test` hay `typecheck`.
 
 Ba thứ tính năng cốt lõi trong `CLAUDE.md` cần tới, chưa có gói nào trong repo đảm nhiệm:
 
-| Cần             | Trạng thái  | Ràng buộc khi chọn                                                           |
-| --------------- | ----------- | ---------------------------------------------------------------------------- |
-| Engine tài liệu | _chưa chọn_ | Phải **khứ hồi** (parse → sửa → serialize lại đúng OOXML), chạy trong Worker |
-| Lưu trữ cục bộ  | _chưa chọn_ | Web API sẵn có: OPFS cho bytes, IndexedDB cho metadata                       |
-| Object storage  | _chưa chọn_ | Tương thích S3 (R2 / MinIO / S3), upload qua presigned URL                   |
+| Cần             | Trạng thái  | Ràng buộc khi chọn                                                                                                                                                                    |
+| --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Engine tài liệu | _chưa chọn_ | Phải **khứ hồi** (parse → sửa → serialize lại đúng OOXML), chạy trong Worker                                                                                                          |
+| Lưu trữ cục bộ  | **Đã chọn** | OPFS cho bytes (`src/lib/documents/opfs-store.ts`), IndexedDB qua `idb` cho metadata (`src/lib/documents/metadata-store.ts`) — xem [TASK-12](tasks/12_luu_tru_opfs_indexeddb_task.md) |
+| Object storage  | _chưa chọn_ | Tương thích S3 (R2 / MinIO / S3), upload qua presigned URL                                                                                                                            |
 
 Về engine tài liệu, điểm dễ sai khi khảo sát: nhiều thư viện Office phổ biến chỉ đi **một chiều** — có bộ chỉ đọc/render, có bộ chỉ sinh file mới từ số không. Ghép một bộ đọc với một bộ ghi **không tự động cho ra khứ hồi**: phần tài liệu mà bộ đọc bỏ qua sẽ biến mất khi bộ ghi dựng lại file. Tiêu chí chọn phải là "parse và serialize lại _cùng_ một tài liệu", kiểm chứng bằng file thật mở lại bằng Microsoft Office.
 
