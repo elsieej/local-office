@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { Button } from '#/components/ui/button'
 import { Separator } from '#/components/ui/separator'
 
@@ -9,7 +10,10 @@ export default function Footer() {
       <Separator className="mx-auto max-w-5xl" />
       <div className="text-muted-foreground mx-auto mt-8 flex w-full max-w-5xl flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
         <p className="text-sm">
-          &copy; {year} Your name here. All rights reserved.
+          &copy; {year} LocalOffice — mã nguồn mở theo{' '}
+          <Link to="/source" className="underline underline-offset-4">
+            AGPL-3.0, tải mã nguồn tại đây
+          </Link>
         </p>
         <p className="text-xs font-semibold tracking-[0.16em] uppercase">
           Built with TanStack Start

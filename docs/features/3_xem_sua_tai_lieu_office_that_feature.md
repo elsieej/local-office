@@ -24,8 +24,8 @@ Sau Feature 2, `.docx`/`.xlsx`/`.pptx` mở/lưu/liệt kê được nhưng bấ
 - Lưu lại đúng khứ hồi (OOXML) — file tải về mở lại được bằng Microsoft Office, không mất phần ONLYOFFICE không hiểu
 - Toàn bộ engine (sdkjs, web-apps, fonts, `x2t.wasm`) tự host trong bundle LocalOffice — không gọi Document Server hay bất kỳ máy chủ ONLYOFFICE nào ở xa
 - Build pipeline lấy asset engine từ image Docker chính thức `onlyoffice/documentserver` (theo mô hình tham khảo [baotlake/office-website](https://github.com/baotlake/office-website)) — xem mục 6, đây là thay đổi hạ tầng build, không phải một gói npm
-- Cơ chế "Tải mã nguồn" hiển thị trên giao diện, đáp ứng nghĩa vụ AGPL §13 (xem mục 6)
-- Thêm `LICENSE` AGPL-3.0 cho toàn repo + khai `"license"` trong `package.json` — làm cùng lúc với PR đưa code ONLYOFFICE đầu tiên vào, không làm trước
+- ~~Cơ chế "Tải mã nguồn" hiển thị trên giao diện, đáp ứng nghĩa vụ AGPL §13~~ **Đã xong** ở [TASK-20](../tasks/20_license_agpl_trang_nguon_task.md) — route `/source`, link ở footer
+- ~~Thêm `LICENSE` AGPL-3.0 cho toàn repo + khai `"license"` trong `package.json`~~ **Đã xong** ở TASK-20
 
 **Ngoài phạm vi**
 
@@ -73,12 +73,12 @@ Sau Feature 2, `.docx`/`.xlsx`/`.pptx` mở/lưu/liệt kê được nhưng bấ
 ## 6. Ràng buộc kỹ thuật
 
 - **Xử lý ở đâu:** hoàn toàn client — không server function/route mới nào để convert/sửa tài liệu
-- **Thư viện/asset mới cần thêm:**
-  - `sdkjs` (418 MB) + `web-apps` (783 MB) + `sdkjs-plugins` (37 MB) (ONLYOFFICE editor core, JS/CSS/HTML — đã đo thật ở [TASK-18](../tasks/18_do_kich_thuoc_asset_onlyoffice_task.md)) — không phải gói npm, vendor từ image `onlyoffice/documentserver` qua build pipeline riêng (Docker), theo mô hình `Dockerfile` của `office-website`. Số đo là cận trên trên đĩa server (mọi loại editor, mọi ngôn ngữ trợ giúp), chưa lọc theo nhu cầu thật của LocalOffice
-  - `x2t` build WebAssembly (bộ chuyển đổi định dạng, ~9.2 MB, đúng bộ dùng để khứ hồi OOXML). **Không lấy được từ image `onlyoffice/documentserver`** (image chính thức chỉ có binary ELF native ~45 MB) — vendor từ [`cryptpad/onlyoffice-x2t-wasm`](https://github.com/cryptpad/onlyoffice-x2t-wasm) (fork `git subtree` từ `ONLYOFFICE/core`, có GitHub Release kèm checksum sha512), một release tag cụ thể, không lấy binary đã build sẵn của `office-website`
-  - Fonts hệ thống ONLYOFFICE dùng để render đúng (`AllFonts.js`/`themes.js`, sinh lúc container khởi động trong bản gốc) — đã đo thật: 162 MB
-- **Build pipeline:** cần Docker để lấy asset từ `onlyoffice/documentserver` image — thay đổi hạ tầng build của repo, ảnh hưởng tới cách deploy (không còn chỉ `npm run build`)
-- **License:** toàn repo chuyển AGPL-3.0 — đã được người có thẩm quyền xác nhận (2026-08-13) — thêm `LICENSE` + khai `package.json` cùng PR đầu tiên đưa code ONLYOFFICE vào
+- **Thư viện/asset mới cần thêm** (đã vendor xong ở [TASK-19](../tasks/19_vendor_pipeline_onlyoffice_task.md), tổng **267.1 MB** đã lọc theo nhu cầu US-9, xem bảng chi tiết trong task đó):
+  - `sdkjs` (chỉ `common`+`word`, 56.1 MB) + `web-apps` (chỉ `documenteditor`+`common`+`api`+`vendor` trừ `monaco`, 9.4 MB) — không phải gói npm, vendor từ image `onlyoffice/documentserver:9.3.0.1` (ghim version) qua `scripts/vendor-onlyoffice.mjs`, theo mô hình tham khảo `Dockerfile` của `office-website`. **Không vendor `sdkjs-plugins`** (marketing/plugin, ngoài phạm vi)
+  - `x2t` build WebAssembly (~41 MB đã giải nén, đúng bộ dùng để khứ hồi OOXML). **Không lấy được từ image `onlyoffice/documentserver`** (image chính thức chỉ có binary ELF native) — vendor từ release `v9.3.0+0` của [`cryptpad/onlyoffice-x2t-wasm`](https://github.com/cryptpad/onlyoffice-x2t-wasm), checksum sha512 xác minh lúc build
+  - Fonts hệ thống ONLYOFFICE dùng để render đúng — 160.6 MB, chưa lọc (rủi ro tối ưu thêm để lại cho TASK-22)
+- **Build pipeline:** đã dựng xong (`npm run vendor:onlyoffice`, cần Docker + `unzip`) — thay đổi hạ tầng build của repo, ảnh hưởng tới cách deploy (không còn chỉ `npm run build`), asset không commit vào Git
+- **License:** toàn repo đã chuyển AGPL-3.0 ở [TASK-20](../tasks/20_license_agpl_trang_nguon_task.md) — `LICENSE` + `package.json` + trang `/source` (nghĩa vụ AGPL §13)
 - **Đụng tới schema CSDL:** Không
 - **Ảnh hưởng kích thước bundle:** lớn — `sdkjs`+`web-apps`+`sdkjs-plugins`+`fonts` ~1.4 GB trên đĩa server (cận trên, chưa lọc theo nhu cầu thật, xem [TASK-18](../tasks/18_do_kich_thuoc_asset_onlyoffice_task.md)), `x2t.wasm` ~9.2 MB (nguồn: [`cryptpad/onlyoffice-x2t-wasm`](https://github.com/cryptpad/onlyoffice-x2t-wasm)). Dung lượng trình duyệt thật sự tải lần đầu vẫn chưa đo được — đo ở [US-9](../stories/9_xem_sua_docx_onlyoffice_story.md), cần editor chạy thật
 

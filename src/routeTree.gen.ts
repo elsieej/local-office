@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as SourceRouteImport } from './routes/source'
 import { Route as DocumentsDocumentIdRouteImport } from './routes/documents/$documentId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -30,6 +31,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SourceRoute = SourceRouteImport.update({
+  id: '/source',
+  path: '/source',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocumentsDocumentIdRoute = DocumentsDocumentIdRouteImport.update({
   id: '/documents/$documentId',
   path: '/documents/$documentId',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/source': typeof SourceRoute
   '/documents/$documentId': typeof DocumentsDocumentIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/source': typeof SourceRoute
   '/documents/$documentId': typeof DocumentsDocumentIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -60,20 +68,33 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/source': typeof SourceRoute
   '/documents/$documentId': typeof DocumentsDocumentIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/about' | '/login' | '/documents/$documentId' | '/api/auth/$'
+    | '/'
+    | '/about'
+    | '/login'
+    | '/source'
+    | '/documents/$documentId'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/login' | '/documents/$documentId' | '/api/auth/$'
+  to:
+    | '/'
+    | '/about'
+    | '/login'
+    | '/source'
+    | '/documents/$documentId'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/login'
+    | '/source'
     | '/documents/$documentId'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
@@ -82,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
+  SourceRoute: typeof SourceRoute
   DocumentsDocumentIdRoute: typeof DocumentsDocumentIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -109,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/source': {
+      id: '/source'
+      path: '/source'
+      fullPath: '/source'
+      preLoaderRoute: typeof SourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/documents/$documentId': {
       id: '/documents/$documentId'
       path: '/documents/$documentId'
@@ -130,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
+  SourceRoute: SourceRoute,
   DocumentsDocumentIdRoute: DocumentsDocumentIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
