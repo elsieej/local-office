@@ -1,21 +1,12 @@
 import { useRef, useState } from 'react'
 import type { ChangeEvent, DragEvent } from 'react'
-import { FileIcon, UploadIcon } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { UploadIcon } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert'
 import { Button } from '#/components/ui/button'
-import {
-  Item,
-  ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemMedia,
-  ItemTitle,
-} from '#/components/ui/item'
-import DocumentStateBadge from '#/components/document-state-badge'
 import { DOCUMENT_EXTENSION_KIND } from '#/constants/document'
-import { saveDocument } from '#/lib/documents/store'
+import { DOCUMENTS_QUERY_KEY, saveDocument } from '#/lib/documents/store'
 import { cn } from '#/lib/utils'
-import type { Document } from '#/lib/documents/types'
 
 const SUPPORTED_EXTENSIONS = Object.keys(DOCUMENT_EXTENSION_KIND)
 const ACCEPT = SUPPORTED_EXTENSIONS.join(',')
@@ -29,9 +20,9 @@ function getErrorMessage(error: unknown): string {
 }
 
 export default function UploadDropzone() {
+  const queryClient = useQueryClient()
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDraggingOver, setIsDraggingOver] = useState(false)
-  const [savedDocuments, setSavedDocuments] = useState<Array<Document>>([])
   const [errors, setErrors] = useState<Array<SaveError>>([])
 
   async function saveFiles(files: Iterable<File>) {
@@ -40,11 +31,11 @@ export default function UploadDropzone() {
       fileList.map((file) => saveDocument(file)),
     )
 
-    const newDocuments: Array<Document> = []
     const newErrors: Array<SaveError> = []
+    let savedCount = 0
     results.forEach((result, index) => {
       if (result.status === 'fulfilled') {
-        newDocuments.push(result.value)
+        savedCount += 1
       } else {
         newErrors.push({
           fileName: fileList[index].name,
@@ -53,8 +44,8 @@ export default function UploadDropzone() {
       }
     })
 
-    if (newDocuments.length > 0) {
-      setSavedDocuments((current) => [...newDocuments, ...current])
+    if (savedCount > 0) {
+      void queryClient.invalidateQueries({ queryKey: DOCUMENTS_QUERY_KEY })
     }
     setErrors(newErrors)
   }
@@ -126,25 +117,6 @@ export default function UploadDropzone() {
             </ul>
           </AlertDescription>
         </Alert>
-      )}
-
-      {savedDocuments.length > 0 && (
-        <ItemGroup>
-          {savedDocuments.map((document) => (
-            <Item key={document.id} variant="outline">
-              <ItemMedia variant="icon">
-                <FileIcon />
-              </ItemMedia>
-              <ItemContent>
-                <ItemTitle>{document.name}</ItemTitle>
-                <ItemDescription>
-                  {(document.size / 1024).toFixed(0)} KB
-                </ItemDescription>
-              </ItemContent>
-              <DocumentStateBadge state={document.state} />
-            </Item>
-          ))}
-        </ItemGroup>
       )}
     </div>
   )

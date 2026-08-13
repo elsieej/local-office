@@ -19,6 +19,8 @@ import {
 } from '#/lib/documents/metadata-store'
 import type { Document } from '#/lib/documents/types'
 
+export const DOCUMENTS_QUERY_KEY = ['documents'] as const
+
 function getExtension(fileName: string): DocumentExtension | undefined {
   const dot = fileName.lastIndexOf('.')
   if (dot === -1) return undefined
