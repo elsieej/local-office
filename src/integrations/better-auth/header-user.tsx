@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { authClient } from '#/lib/auth-client'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
@@ -6,6 +7,10 @@ import { Skeleton } from '#/components/ui/skeleton'
 
 export default function BetterAuthHeader() {
   const { data: session, isPending } = authClient.useSession()
+  const [isSigningOut, setIsSigningOut] = useState(false)
+  // Ref, not just state: two clicks in the same tick (dblclick) share the same
+  // stale closure before React re-renders, so `isSigningOut` alone can't stop the second one.
+  const signOutInFlight = useRef(false)
 
   if (isPending) {
     return <Skeleton className="size-8 rounded-full" />
@@ -22,8 +27,15 @@ export default function BetterAuthHeader() {
         </Avatar>
         <Button
           variant="outline"
+          disabled={isSigningOut}
           onClick={() => {
-            void authClient.signOut()
+            if (signOutInFlight.current) return
+            signOutInFlight.current = true
+            setIsSigningOut(true)
+            void authClient.signOut().finally(() => {
+              signOutInFlight.current = false
+              setIsSigningOut(false)
+            })
           }}
         >
           Sign out
