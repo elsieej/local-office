@@ -1,7 +1,7 @@
 # US-6: Danh sách tài liệu đã mở
 
 **Feature:** [Mở và xem tài liệu cục bộ](../features/2_mo_va_xem_tai_lieu_cuc_bo_feature.md)
-**Trạng thái:** ⬜ Nháp
+**Trạng thái:** ✅ Xong
 **Dữ liệu rời máy:** Không
 
 ---
@@ -12,17 +12,17 @@
 
 ## Mong muốn
 
-- [ ] Danh sách hiển thị tên, loại, dung lượng, thời gian mở, trạng thái (🔒 Cục bộ) cho mọi tài liệu đã lưu
-- [ ] Danh sách đọc từ IndexedDB, không phụ thuộc state trong bộ nhớ tab — tải lại trang hay mở tab mới vẫn thấy đủ
-- [ ] Bấm vào một tài liệu → mở lại đúng file đó (điều hướng tới trang xem tương ứng)
-- [ ] Xoá một tài liệu → xoá cả bytes trong OPFS lẫn metadata trong IndexedDB, không còn bản sao nào, biến mất khỏi danh sách ngay
-- [ ] Danh sách rỗng → hiện gợi ý mở file thay vì khoảng trắng
-- [ ] Đang tải danh sách → hiện skeleton, không giật layout khi dữ liệu về
+- [x] Danh sách hiển thị tên, loại, dung lượng, thời gian mở, trạng thái (🔒 Cục bộ) cho mọi tài liệu đã lưu
+- [x] Danh sách đọc từ IndexedDB, không phụ thuộc state trong bộ nhớ tab — tải lại trang hay mở tab mới vẫn thấy đủ
+- [x] Bấm vào một tài liệu → mở lại đúng file đó (điều hướng tới trang xem tương ứng)
+- [x] Xoá một tài liệu → xoá cả bytes trong OPFS lẫn metadata trong IndexedDB, không còn bản sao nào, biến mất khỏi danh sách ngay
+- [x] Danh sách rỗng → hiện gợi ý mở file thay vì khoảng trắng
+- [x] Đang tải danh sách → hiện skeleton, không giật layout khi dữ liệu về
 
 ## Task
 
-- [ ] [TASK-14: Trang danh sách tài liệu](../tasks/14_danh_sach_tai_lieu_task.md) · #27
-- [ ] [TASK-15: Mở lại và xoá tài liệu cục bộ](../tasks/15_mo_lai_xoa_tai_lieu_task.md) · #29
+- [x] [TASK-14: Trang danh sách tài liệu](../tasks/14_danh_sach_tai_lieu_task.md) · #27
+- [x] [TASK-15: Mở lại và xoá tài liệu cục bộ](../tasks/15_mo_lai_xoa_tai_lieu_task.md) · #29
 
 ## Xong khi
 
