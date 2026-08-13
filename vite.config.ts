@@ -27,7 +27,16 @@ const config = defineConfig({
   define: {
     __GIT_COMMIT_SHA__: JSON.stringify(readGitCommitSha()),
   },
-  plugins: [devtools(), tailwindcss(), tanstackStart(), viteReact()],
+  plugins: [
+    // consolePiping tắt: cơ chế mirror console server->client của
+    // TanStack Devtools lặp lại toàn bộ lịch sử log mỗi lần kết nối SSE
+    // lại (dev only), tích luỹ thành các dòng console cực lớn — làm
+    // Playwright MCP mất kết nối nhiều lần khi kiểm thử TASK-21/22.
+    devtools({ consolePiping: { enabled: false } }),
+    tailwindcss(),
+    tanstackStart(),
+    viteReact(),
+  ],
 })
 
 export default config

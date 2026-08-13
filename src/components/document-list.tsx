@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { FolderOpenIcon, Trash2Icon } from 'lucide-react'
+import { EyeIcon, FolderOpenIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert'
 import { Button } from '#/components/ui/button'
 import {
@@ -95,40 +95,81 @@ export default function DocumentList() {
 
   return (
     <ItemGroup>
-      {documents.map((doc) => (
-        <Item key={doc.id} variant="outline">
-          <ItemMedia variant="icon">
-            <DocumentKindIcon kind={doc.kind} />
-          </ItemMedia>
-          <ItemContent>
-            <ItemTitle>
-              <Link
-                to="/documents/$documentId"
-                params={{ documentId: doc.id }}
-                className="hover:underline"
+      {documents.map((doc) => {
+        const isWord = doc.kind === 'word'
+
+        return (
+          <Item key={doc.id} variant="outline">
+            <ItemMedia variant="icon">
+              <DocumentKindIcon kind={doc.kind} />
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>
+                {isWord ? (
+                  doc.name
+                ) : (
+                  <Link
+                    to="/documents/$documentId"
+                    params={{ documentId: doc.id }}
+                    search={{ mode: 'view' }}
+                    className="hover:underline"
+                  >
+                    {doc.name}
+                  </Link>
+                )}
+              </ItemTitle>
+              <ItemDescription>
+                {formatDocumentSize(doc.size)} ·{' '}
+                {formatDocumentOpenedAt(doc.openedAt)}
+              </ItemDescription>
+            </ItemContent>
+            <DocumentStateBadge state={doc.state} />
+            <ItemActions>
+              {isWord && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    render={
+                      <Link
+                        to="/documents/$documentId"
+                        params={{ documentId: doc.id }}
+                        search={{ mode: 'view' }}
+                      />
+                    }
+                  >
+                    <EyeIcon />
+                    Xem
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    render={
+                      <Link
+                        to="/documents/$documentId"
+                        params={{ documentId: doc.id }}
+                        search={{ mode: 'edit' }}
+                      />
+                    }
+                  >
+                    <PencilIcon />
+                    Sửa
+                  </Button>
+                </>
+              )}
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Xoá ${doc.name}`}
+                disabled={deleteMutation.isPending}
+                onClick={() => handleDelete(doc.id, doc.name)}
               >
-                {doc.name}
-              </Link>
-            </ItemTitle>
-            <ItemDescription>
-              {formatDocumentSize(doc.size)} ·{' '}
-              {formatDocumentOpenedAt(doc.openedAt)}
-            </ItemDescription>
-          </ItemContent>
-          <DocumentStateBadge state={doc.state} />
-          <ItemActions>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Xoá ${doc.name}`}
-              disabled={deleteMutation.isPending}
-              onClick={() => handleDelete(doc.id, doc.name)}
-            >
-              <Trash2Icon />
-            </Button>
-          </ItemActions>
-        </Item>
-      ))}
+                <Trash2Icon />
+              </Button>
+            </ItemActions>
+          </Item>
+        )
+      })}
     </ItemGroup>
   )
 }
