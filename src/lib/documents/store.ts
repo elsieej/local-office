@@ -14,6 +14,7 @@ import {
 } from '#/lib/documents/opfs-store'
 import {
   deleteDocumentMeta,
+  getDocumentMeta,
   listDocumentMeta,
   putDocumentMeta,
 } from '#/lib/documents/metadata-store'
@@ -60,6 +61,13 @@ export async function saveDocument(file: File): Promise<Document> {
 
 export function listDocuments(): Promise<Array<Document>> {
   return listDocumentMeta()
+}
+
+export async function getDocument(id: string): Promise<Document | null> {
+  // react-query's queryFn không cho phép resolve `undefined` (coi là lỗi) —
+  // trả `null` để "không tìm thấy" là một kết quả thành công bình thường.
+  const document = await getDocumentMeta(id)
+  return document ?? null
 }
 
 export function openDocument(id: string): Promise<File> {

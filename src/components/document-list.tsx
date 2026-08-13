@@ -1,6 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
-import { FolderOpenIcon } from 'lucide-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import { FolderOpenIcon, Trash2Icon } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert'
+import { Button } from '#/components/ui/button'
 import {
   Empty,
   EmptyDescription,
@@ -10,6 +12,7 @@ import {
 } from '#/components/ui/empty'
 import {
   Item,
+  ItemActions,
   ItemContent,
   ItemDescription,
   ItemGroup,
@@ -23,9 +26,15 @@ import {
   formatDocumentOpenedAt,
   formatDocumentSize,
 } from '#/lib/documents/format'
-import { DOCUMENTS_QUERY_KEY, listDocuments } from '#/lib/documents/store'
+import {
+  DOCUMENTS_QUERY_KEY,
+  deleteDocument,
+  listDocuments,
+} from '#/lib/documents/store'
 
 export default function DocumentList() {
+  const queryClient = useQueryClient()
+
   const {
     data: documents,
     isPending,
@@ -34,6 +43,17 @@ export default function DocumentList() {
     queryKey: DOCUMENTS_QUERY_KEY,
     queryFn: listDocuments,
   })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteDocument,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: DOCUMENTS_QUERY_KEY }),
+  })
+
+  function handleDelete(id: string, name: string) {
+    if (!window.confirm(`Xoá "${name}"? Không thể hoàn tác.`)) return
+    deleteMutation.mutate(id)
+  }
 
   if (isPending) {
     return (
@@ -75,19 +95,38 @@ export default function DocumentList() {
 
   return (
     <ItemGroup>
-      {documents.map((document) => (
-        <Item key={document.id} variant="outline">
+      {documents.map((doc) => (
+        <Item key={doc.id} variant="outline">
           <ItemMedia variant="icon">
-            <DocumentKindIcon kind={document.kind} />
+            <DocumentKindIcon kind={doc.kind} />
           </ItemMedia>
           <ItemContent>
-            <ItemTitle>{document.name}</ItemTitle>
+            <ItemTitle>
+              <Link
+                to="/documents/$documentId"
+                params={{ documentId: doc.id }}
+                className="hover:underline"
+              >
+                {doc.name}
+              </Link>
+            </ItemTitle>
             <ItemDescription>
-              {formatDocumentSize(document.size)} ·{' '}
-              {formatDocumentOpenedAt(document.openedAt)}
+              {formatDocumentSize(doc.size)} ·{' '}
+              {formatDocumentOpenedAt(doc.openedAt)}
             </ItemDescription>
           </ItemContent>
-          <DocumentStateBadge state={document.state} />
+          <DocumentStateBadge state={doc.state} />
+          <ItemActions>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Xoá ${doc.name}`}
+              disabled={deleteMutation.isPending}
+              onClick={() => handleDelete(doc.id, doc.name)}
+            >
+              <Trash2Icon />
+            </Button>
+          </ItemActions>
         </Item>
       ))}
     </ItemGroup>

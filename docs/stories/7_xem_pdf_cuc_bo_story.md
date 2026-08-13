@@ -1,7 +1,7 @@
 # US-7: Xem tài liệu PDF cục bộ
 
 **Feature:** [Mở và xem tài liệu cục bộ](../features/2_mo_va_xem_tai_lieu_cuc_bo_feature.md)
-**Trạng thái:** ⬜ Nháp
+**Trạng thái:** ✅ Xong
 **Dữ liệu rời máy:** Không
 
 ---
@@ -12,17 +12,17 @@
 
 ## Mong muốn
 
-- [ ] Mở tài liệu `.pdf` từ danh sách → nội dung trang đầu hiện ra, điều hướng qua lại giữa các trang được
-- [ ] Phóng to / thu nhỏ trang xem được
-- [ ] Tìm kiếm nội dung trong tài liệu, nhảy tới kết quả khớp
-- [ ] Toàn bộ luồng xem hoạt động khi tắt mạng (đã mở file trước đó) — không request nào ra ngoài
-- [ ] Mở tài liệu `.docx`/`.xlsx`/`.pptx`/`.doc`/`.xls`/`.ppt` từ danh sách → thông báo rõ "chưa hỗ trợ xem định dạng này", không trang trắng, không lỗi console
-- [ ] PDF hỏng/không đọc được → báo lỗi rõ ràng, không làm treo trang
+- [x] Mở tài liệu `.pdf` từ danh sách → nội dung trang đầu hiện ra, điều hướng qua lại giữa các trang được
+- [x] Phóng to / thu nhỏ trang xem được
+- [x] Tìm kiếm nội dung trong tài liệu, nhảy tới kết quả khớp
+- [x] Toàn bộ luồng xem hoạt động khi tắt mạng (đã mở file trước đó) — không request nào ra ngoài
+- [x] Mở tài liệu `.docx`/`.xlsx`/`.pptx`/`.doc`/`.xls`/`.ppt` từ danh sách → thông báo rõ "chưa hỗ trợ xem định dạng này", không trang trắng, không lỗi console
+- [x] PDF hỏng/không đọc được → báo lỗi rõ ràng, không làm treo trang
 
 ## Task
 
-- [ ] [TASK-16: Tích hợp pdf.js — trang xem PDF](../tasks/16_pdf_viewer_task.md) · #TBD
-- [ ] [TASK-17: Placeholder định dạng chưa hỗ trợ + kiểm thử ngoại tuyến](../tasks/17_placeholder_ngoai_tuyen_task.md) · #TBD
+- [x] [TASK-16: Tích hợp pdf.js — trang xem PDF](../tasks/16_pdf_viewer_task.md) · #31
+- [x] [TASK-17: Placeholder định dạng chưa hỗ trợ + kiểm thử ngoại tuyến](../tasks/17_placeholder_ngoai_tuyen_task.md) · #33
 
 ## Xong khi
 
