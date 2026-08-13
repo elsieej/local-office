@@ -24,12 +24,12 @@
 - [ ] `browser_network_requests` trong suốt luồng xem/sửa/lưu: không có request nào ra ngoài domain LocalOffice (kế thừa câu hỏi mở từ US-8 — đo được thật lần đầu ở story này vì cần editor chạy thật)
 - [ ] Đo dung lượng thật trình duyệt tải ở lần mở editor đầu tiên, so với kỳ vọng "vài giây" của `CLAUDE.md` — ghi kết luận rõ ràng dù đạt hay không đạt (kế thừa từ US-8)
 - [ ] File `.docx` hỏng/không parse được → `x2t` báo lỗi rõ, không treo trang, không mất file gốc trong OPFS
-- [ ] Trang "Tải mã nguồn" (nghĩa vụ AGPL §13) có link thật trỏ đúng bản đang chạy, hiển thị được từ giao diện chính
+- [x] Trang "Tải mã nguồn" (nghĩa vụ AGPL §13) có link thật trỏ đúng bản đang chạy, hiển thị được từ giao diện chính
 
 ## Task
 
 - [x] [TASK-19: Vendor pipeline asset ONLYOFFICE + `x2t.wasm`](../tasks/19_vendor_pipeline_onlyoffice_task.md) · #38
-- [ ] TASK-20: Thêm `LICENSE` AGPL-3.0 + trang "Tải mã nguồn" — chưa viết task doc, mở sau khi TASK-19 xong
+- [x] [TASK-20: LICENSE AGPL-3.0 + trang "Tải mã nguồn"](../tasks/20_license_agpl_trang_nguon_task.md) · #41
 - [ ] TASK-21: Tích hợp `DocEditor` vào `/documents/$documentId`, 2 nút Xem/Sửa — chưa viết task doc
 - [ ] TASK-22: Lưu khứ hồi + đo network payload/egress thật — chưa viết task doc
 
