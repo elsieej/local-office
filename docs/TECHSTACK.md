@@ -3,7 +3,7 @@
 > Dự án được xây bằng gì, mỗi mảnh nối dây ở đâu.
 > Xem [`../CLAUDE.md`](../CLAUDE.md) để biết sản phẩm này _là gì_, [`ARCHITECTURE.md`](ARCHITECTURE.md) để biết tài liệu đi qua những trạng thái và ranh giới nào.
 
-**Hiện trạng:** `src/` là scaffold `create-tsrouter-app` (32 file, ba route demo, một bảng `todos`) đã chuyển giao diện sang shadcn/ui. Đăng nhập/tài khoản (feature 1) đã xong. Lớp lưu trữ tài liệu cục bộ (`src/lib/documents/`) đã có — xem `src/lib/documents/`; chưa có engine xem/sửa Office thật (docx/xlsx/pptx).
+**Hiện trạng:** `src/` là scaffold `create-tsrouter-app` (32 file, ba route demo, một bảng `todos`) đã chuyển giao diện sang shadcn/ui. Đăng nhập/tài khoản (feature 1) đã xong. Lớp lưu trữ tài liệu cục bộ (`src/lib/documents/`) đã có — xem `src/lib/documents/`. Engine xem/sửa Office thật (ONLYOFFICE) đã chọn, pipeline vendor asset đã dựng (`scripts/vendor-onlyoffice.mjs`) — chưa tích hợp vào UI (US-9 đang làm).
 
 ---
 
@@ -56,20 +56,21 @@ Phiên bản là **range khai báo** trong `package.json`.
 
 ## 2. Cấu hình — mỗi mảnh nối dây ở đâu
 
-| File                   | Nội dung đáng nhớ                                                                                                                     |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `vite.config.ts`       | Thứ tự plugin `devtools() → tailwindcss() → tanstackStart() → viteReact()`; `devtools()` **bắt buộc đứng đầu**                        |
-| `tsconfig.json`        | `strict`, `verbatimModuleSyntax`, `noUnusedLocals/Parameters`, `moduleResolution: bundler`, `jsx: react-jsx`                          |
-| `tsr.config.json`      | `{ "target": "react" }` — cấu hình sinh route                                                                                         |
-| `drizzle.config.ts`    | dialect `postgresql`, schema `./src/db/schema.ts`, migration ra `./drizzle`, đọc env từ `.env.local` rồi `.env`                       |
-| `eslint.config.js`     | Kế thừa `@tanstack/eslint-config`, tắt `import/order`, `sort-imports`, `require-await`, vài rule khác                                 |
-| `prettier.config.js`   | `semi: false`, `singleQuote: true`, `trailingComma: 'all'` — quản cả markdown trong `docs/`                                           |
-| `.env.local`           | `DATABASE_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `GH_TOKEN` (gitignore qua `*.local`); mẫu ở `.env.example`                   |
-| `docker-compose.yaml`  | Postgres cục bộ cho dev (`local_office`/`local_office`), cổng host **5433** (5432 hay bị máy dev chiếm) — `npm run db:up` / `db:down` |
-| `components.json`      | Cấu hình shadcn: `style: base-nova` (tiền tố `base-` chính là thứ chọn Base UI thay vì Radix), alias theo `#/`                        |
-| `commitlint.config.js` | `extends: ['@commitlint/config-conventional']` — luật cho thông điệp commit                                                           |
-| `.husky/`              | `pre-commit` → `lint-staged`; `commit-msg` → `commitlint --edit "$1"`. Cài lại bằng `npm install`                                     |
-| `package.json`         | Khoá `lint-staged`: `*.{ts,tsx,js,jsx}` → Prettier + ESLint `--fix`; `*.{json,md,css,yml,yaml}` → Prettier                            |
+| File                            | Nội dung đáng nhớ                                                                                                                                                                                                                       |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vite.config.ts`                | Thứ tự plugin `devtools() → tailwindcss() → tanstackStart() → viteReact()`; `devtools()` **bắt buộc đứng đầu**                                                                                                                          |
+| `tsconfig.json`                 | `strict`, `verbatimModuleSyntax`, `noUnusedLocals/Parameters`, `moduleResolution: bundler`, `jsx: react-jsx`                                                                                                                            |
+| `tsr.config.json`               | `{ "target": "react" }` — cấu hình sinh route                                                                                                                                                                                           |
+| `drizzle.config.ts`             | dialect `postgresql`, schema `./src/db/schema.ts`, migration ra `./drizzle`, đọc env từ `.env.local` rồi `.env`                                                                                                                         |
+| `eslint.config.js`              | Kế thừa `@tanstack/eslint-config`, tắt `import/order`, `sort-imports`, `require-await`, vài rule khác                                                                                                                                   |
+| `prettier.config.js`            | `semi: false`, `singleQuote: true`, `trailingComma: 'all'` — quản cả markdown trong `docs/`                                                                                                                                             |
+| `.env.local`                    | `DATABASE_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `GH_TOKEN` (gitignore qua `*.local`); mẫu ở `.env.example`                                                                                                                     |
+| `docker-compose.yaml`           | Postgres cục bộ cho dev (`local_office`/`local_office`), cổng host **5433** (5432 hay bị máy dev chiếm) — `npm run db:up` / `db:down`                                                                                                   |
+| `components.json`               | Cấu hình shadcn: `style: base-nova` (tiền tố `base-` chính là thứ chọn Base UI thay vì Radix), alias theo `#/`                                                                                                                          |
+| `commitlint.config.js`          | `extends: ['@commitlint/config-conventional']` — luật cho thông điệp commit                                                                                                                                                             |
+| `.husky/`                       | `pre-commit` → `lint-staged`; `commit-msg` → `commitlint --edit "$1"`. Cài lại bằng `npm install`                                                                                                                                       |
+| `package.json`                  | Khoá `lint-staged`: `*.{ts,tsx,js,jsx}` → Prettier + ESLint `--fix`; `*.{json,md,css,yml,yaml}` → Prettier                                                                                                                              |
+| `scripts/vendor-onlyoffice.mjs` | Kéo asset engine ONLYOFFICE (Docker, version ghim) + `x2t.wasm` (checksum ghim) vào `public/onlyoffice/` — `npm run vendor:onlyoffice`. Yêu cầu máy dev có Docker + `unzip`. Xem [TASK-19](tasks/19_vendor_pipeline_onlyoffice_task.md) |
 
 **Alias import:** `package.json → imports: { "#/*": "./src/*" }`. `tsconfig.json` khai báo thêm `@/*` nhưng không code nào dùng — giữ `#/` cho nhất quán.
 
@@ -101,6 +102,12 @@ src/
 ├── routeTree.gen.ts     SINH TỰ ĐỘNG — không sửa tay
 ├── schemas/              auth.ts — schema zod dùng chung, theo domain
 └── styles.css           token shadcn (`:root` / `.dark`) + font Manrope · Fraunces
+
+scripts/
+└── vendor-onlyoffice.mjs   sinh public/onlyoffice/ (gitignored) — xem mục 2
+
+public/onlyoffice/       SINH BỞI SCRIPT, gitignored, không commit — sdkjs/ · web-apps/ ·
+                          fonts/ · x2t/ · VENDORED.json (version + checksum đã vendor)
 ```
 
 **Không có file entry** (`main.tsx`, `client.tsx`, `server.tsx`, `start.ts`) — plugin `tanstackStart()` tự sinh. Bề mặt entry chỉ gồm `src/router.tsx` và `src/routes/__root.tsx`.
@@ -120,6 +127,7 @@ src/
 | `npm run db:generate` · `db:migrate` · `db:push`    | Migration Drizzle                                                   |
 | `npm run db:studio`                                 | Trình duyệt CSDL                                                    |
 | `npm run db:up` · `db:down`                         | Bật/tắt Postgres cục bộ qua Docker Compose                          |
+| `npm run vendor:onlyoffice`                         | Sinh `public/onlyoffice/` — yêu cầu Docker + `unzip`, mất vài phút  |
 | `npx -y @better-auth/cli migrate`                   | Sinh bảng `user`/`session`/`account`/`verification` cho Better Auth |
 | `npx shadcn@latest add <tên>`                       | Thêm component vào `src/components/ui/`                             |
 
@@ -129,14 +137,14 @@ Không có script `test` hay `typecheck`.
 
 ## 5. Mảnh còn thiếu
 
-Ba thứ tính năng cốt lõi trong `CLAUDE.md` cần tới, chưa có gói nào trong repo đảm nhiệm:
+| Cần             | Trạng thái  | Ràng buộc khi chọn                                                                                                                                                                                                                                        |
+| --------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Engine tài liệu | **Đã chọn** | ONLYOFFICE (sdkjs/web-apps + `x2t` WASM), nhúng client-only — xem [Feature 3](features/3_xem_sua_tai_lieu_office_that_feature.md). Vendor pipeline đã dựng ([TASK-19](tasks/19_vendor_pipeline_onlyoffice_task.md)), chưa tích hợp vào UI (US-9 đang làm) |
+| Lưu trữ cục bộ  | **Đã chọn** | OPFS cho bytes (`src/lib/documents/opfs-store.ts`), IndexedDB qua `idb` cho metadata (`src/lib/documents/metadata-store.ts`) — xem [TASK-12](tasks/12_luu_tru_opfs_indexeddb_task.md)                                                                     |
+| Object storage  | _chưa chọn_ | Tương thích S3 (R2 / MinIO / S3), upload qua presigned URL                                                                                                                                                                                                |
 
-| Cần             | Trạng thái  | Ràng buộc khi chọn                                                                                                                                                                    |
-| --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Engine tài liệu | _chưa chọn_ | Phải **khứ hồi** (parse → sửa → serialize lại đúng OOXML), chạy trong Worker                                                                                                          |
-| Lưu trữ cục bộ  | **Đã chọn** | OPFS cho bytes (`src/lib/documents/opfs-store.ts`), IndexedDB qua `idb` cho metadata (`src/lib/documents/metadata-store.ts`) — xem [TASK-12](tasks/12_luu_tru_opfs_indexeddb_task.md) |
-| Object storage  | _chưa chọn_ | Tương thích S3 (R2 / MinIO / S3), upload qua presigned URL                                                                                                                            |
+Về engine tài liệu, điểm dễ sai khi khảo sát: nhiều thư viện Office phổ biến chỉ đi **một chiều** — có bộ chỉ đọc/render, có bộ chỉ sinh file mới từ số không. Ghép một bộ đọc với một bộ ghi **không tự động cho ra khứ hồi**: phần tài liệu mà bộ đọc bỏ qua sẽ biến mất khi bộ ghi dựng lại file. Tiêu chí chọn phải là "parse và serialize lại _cùng_ một tài liệu", kiểm chứng bằng file thật mở lại bằng Microsoft Office. ONLYOFFICE thoả tiêu chí này (engine gốc dùng để mở/lưu thật, không phải bộ đọc/ghi ghép rời).
 
-Về engine tài liệu, điểm dễ sai khi khảo sát: nhiều thư viện Office phổ biến chỉ đi **một chiều** — có bộ chỉ đọc/render, có bộ chỉ sinh file mới từ số không. Ghép một bộ đọc với một bộ ghi **không tự động cho ra khứ hồi**: phần tài liệu mà bộ đọc bỏ qua sẽ biến mất khi bộ ghi dựng lại file. Tiêu chí chọn phải là "parse và serialize lại _cùng_ một tài liệu", kiểm chứng bằng file thật mở lại bằng Microsoft Office.
+**ONLYOFFICE là AGPL-3.0** — LocalOffice sẽ chuyển sang AGPL-3.0 toàn repo khi PR đầu tiên đưa code ONLYOFFICE vào (chưa làm, xem mục 3 [Feature 3](features/3_xem_sua_tai_lieu_office_that_feature.md)). Asset engine (`public/onlyoffice/`) không commit vào Git — sinh lại bằng `npm run vendor:onlyoffice` trên từng máy dev/CI, tránh phình repo với ~267 MB nhị phân đã vendor.
 
 `src/lib/auth.ts` đã nối `database` adapter (`pg` Pool) và đã chạy `npx @better-auth/cli migrate` — bảng `user`/`session`/`account`/`verification` tồn tại thật, không còn stateless. Postgres cục bộ chạy qua `docker-compose.yaml` (`npm run db:up`).
