@@ -2,7 +2,7 @@
 
 **Story:** [US-1](../stories/1_dang_ky_tai_khoan_story.md)
 **Issue:** #2 · **Nhánh:** `feat/trang-dang-ky`
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 

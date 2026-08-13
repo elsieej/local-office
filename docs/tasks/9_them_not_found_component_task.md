@@ -2,7 +2,7 @@
 
 **Story:** Không thuộc user story nào — hotfix phát hiện khi kiểm thử [TASK-3](3_trang_dang_nhap_task.md) qua Playwright MCP.
 **Issue:** #12 · **Nhánh:** `fix/root-not-found-component`
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 

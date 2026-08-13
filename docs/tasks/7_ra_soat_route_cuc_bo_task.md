@@ -2,7 +2,7 @@
 
 **Story:** [US-4](../stories/4_dung_duoc_khi_chua_dang_nhap_story.md)
 **Issue:** #7 · **Nhánh:** `docs/ra-soat-route-cuc-bo`
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 

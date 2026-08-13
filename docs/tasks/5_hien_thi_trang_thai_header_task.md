@@ -2,7 +2,7 @@
 
 **Story:** [US-3](../stories/3_trang_thai_dang_nhap_toan_ung_dung_story.md)
 **Issue:** #5 · **Nhánh:** `feat/header-user-layout-chinh`
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 

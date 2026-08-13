@@ -1,7 +1,7 @@
 # US-4: Dùng đầy đủ tính năng cục bộ khi chưa đăng nhập
 
 **Feature:** [Đăng nhập & tài khoản người dùng](../features/1_dang_nhap_va_tai_khoan_nguoi_dung_feature.md)
-**Trạng thái:** 🟡 Đang làm
+**Trạng thái:** ✅ Xong
 **Dữ liệu rời máy:** Không
 
 ---
@@ -12,13 +12,13 @@
 
 ## Mong muốn
 
-- [ ] Không route nào trong luồng mở/xem/sửa/tải về cục bộ redirect người dùng chưa đăng nhập sang trang đăng nhập
-- [ ] Không có banner/modal nào ép đăng nhập khi chỉ dùng tính năng cục bộ
-- [ ] Rà soát toàn bộ route hiện có xác nhận không route cục bộ nào bị chặn bởi guard đăng nhập
+- [x] Không route nào trong luồng mở/xem/sửa/tải về cục bộ redirect người dùng chưa đăng nhập sang trang đăng nhập
+- [x] Không có banner/modal nào ép đăng nhập khi chỉ dùng tính năng cục bộ
+- [x] Rà soát toàn bộ route hiện có xác nhận không route cục bộ nào bị chặn bởi guard đăng nhập
 
 ## Task
 
-- [ ] [TASK-7: Rà soát route xác nhận ranh giới cục bộ/đám mây không bị đăng nhập chặn nhầm](../tasks/7_ra_soat_route_cuc_bo_task.md) · #7
+- [x] [TASK-7: Rà soát route xác nhận ranh giới cục bộ/đám mây không bị đăng nhập chặn nhầm](../tasks/7_ra_soat_route_cuc_bo_task.md) · #7
 
 ## Xong khi
 
