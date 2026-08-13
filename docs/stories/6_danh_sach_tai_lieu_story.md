@@ -22,7 +22,7 @@
 ## Task
 
 - [ ] [TASK-14: Trang danh sách tài liệu](../tasks/14_danh_sach_tai_lieu_task.md) · #27
-- [ ] [TASK-15: Mở lại và xoá tài liệu cục bộ](../tasks/15_mo_lai_xoa_tai_lieu_task.md) · #TBD
+- [ ] [TASK-15: Mở lại và xoá tài liệu cục bộ](../tasks/15_mo_lai_xoa_tai_lieu_task.md) · #29
 
 ## Xong khi
 
