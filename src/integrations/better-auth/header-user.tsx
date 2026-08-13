@@ -33,7 +33,7 @@ export default function BetterAuthHeader() {
   }
 
   return (
-    <Button variant="outline" render={<Link to="/demo/better-auth" />}>
+    <Button variant="outline" render={<Link to="/login" />}>
       Sign in
     </Button>
   )

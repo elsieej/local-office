@@ -1,7 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { useMutation } from '@tanstack/react-query'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { z } from 'zod'
 import { authClient } from '#/lib/auth-client'
+import { AUTH_ERROR_CODE, AUTH_ERROR_MESSAGE } from '#/constants/error-response'
+import { SIGN_IN_SCHEMA, SIGN_UP_SCHEMA } from '#/schemas/auth'
 import { Alert, AlertDescription } from '#/components/ui/alert'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import { Button } from '#/components/ui/button'
@@ -17,68 +19,90 @@ import { Field, FieldGroup, FieldLabel } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
 import { Spinner } from '#/components/ui/spinner'
 
-const SIGN_IN_SCHEMA = z.object({
-  email: z.email('Enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-})
+type AuthErrorInfo = {
+  code?: string
+  message?: string
+}
 
-const SIGN_UP_SCHEMA = SIGN_IN_SCHEMA.extend({
-  name: z.string().trim().min(1, 'Name is required'),
-})
+type AuthFormInput = {
+  isSignUp: boolean
+  email: string
+  password: string
+  name: string
+}
 
-const DUPLICATE_EMAIL_CODE = 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL'
+async function submitAuthForm({
+  isSignUp,
+  email,
+  password,
+  name,
+}: AuthFormInput) {
+  let result
+  try {
+    result = isSignUp
+      ? await authClient.signUp.email({ email, password, name })
+      : await authClient.signIn.email({ email, password })
+  } catch {
+    throw { message: 'An unexpected error occurred' } satisfies AuthErrorInfo
+  }
+
+  if (result.error) {
+    throw result.error satisfies AuthErrorInfo
+  }
+
+  return result.data
+}
 
 export const Route = createFileRoute('/login')({
   component: Login,
 })
 
 function Login() {
+  const navigate = useNavigate()
   const { data: session, isPending } = authClient.useSession()
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
-  const [error, setError] = useState('')
-  const [isDuplicateEmail, setIsDuplicateEmail] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [validationError, setValidationError] = useState('')
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const authMutation = useMutation<unknown, AuthErrorInfo, AuthFormInput>({
+    mutationFn: submitAuthForm,
+    onSuccess: (_data, variables) => {
+      if (!variables.isSignUp) {
+        void navigate({ to: '/' })
+      }
+    },
+  })
+
+  const isDuplicateEmail =
+    authMutation.error?.code === AUTH_ERROR_CODE.DUPLICATE_EMAIL
+  const errorMessage =
+    validationError ||
+    (authMutation.error &&
+      (authMutation.error.code && AUTH_ERROR_MESSAGE[authMutation.error.code]
+        ? AUTH_ERROR_MESSAGE[authMutation.error.code]
+        : authMutation.error.message || 'Authentication failed'))
+
+  function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
-    setError('')
-    setIsDuplicateEmail(false)
+    setValidationError('')
 
     const schema = isSignUp ? SIGN_UP_SCHEMA : SIGN_IN_SCHEMA
     const parsed = schema.safeParse({ email, password, name })
 
     if (!parsed.success) {
-      setError(parsed.error.issues[0].message)
+      setValidationError(parsed.error.issues[0].message)
       return
     }
 
-    setIsLoading(true)
-
-    try {
-      const result = isSignUp
-        ? await authClient.signUp.email({ email, password, name })
-        : await authClient.signIn.email({ email, password })
-
-      if (result.error) {
-        if (result.error.code === DUPLICATE_EMAIL_CODE) {
-          setIsDuplicateEmail(true)
-        }
-        setError(result.error.message || 'Authentication failed')
-      }
-    } catch {
-      setError('An unexpected error occurred')
-    } finally {
-      setIsLoading(false)
-    }
+    authMutation.mutate({ isSignUp, email, password, name })
   }
 
   function handleModeSwitch() {
     setIsSignUp(!isSignUp)
-    setError('')
-    setIsDuplicateEmail(false)
+    setValidationError('')
+    authMutation.reset()
   }
 
   if (isPending) {
@@ -185,10 +209,10 @@ function Login() {
                 />
               </Field>
 
-              {error && (
+              {errorMessage && (
                 <Alert variant="destructive">
                   <AlertDescription>
-                    {error}
+                    {errorMessage}
                     {isDuplicateEmail && (
                       <>
                         {' '}
@@ -206,9 +230,13 @@ function Login() {
                 </Alert>
               )}
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading && <Spinner data-icon="inline-start" />}
-                {isLoading
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={authMutation.isPending}
+              >
+                {authMutation.isPending && <Spinner data-icon="inline-start" />}
+                {authMutation.isPending
                   ? 'Please wait'
                   : isSignUp
                     ? 'Create account'
