@@ -26,17 +26,18 @@ Xác nhận (và giữ nguyên) rằng không route/luồng cục bộ nào tron
 
 Route hiện có trong `src/routes/` (rà soát ngày 2026-08-13):
 
-| Route           | File               | Cần đăng nhập?                                                                             |
-| --------------- | ------------------ | ------------------------------------------------------------------------------------------ |
-| `/`             | `index.tsx`        | Không                                                                                      |
-| `/about`        | `about.tsx`        | Không                                                                                      |
-| `/login`        | `login.tsx`        | Không (route công khai — chính là nơi để đăng nhập)                                        |
-| `/demo/drizzle` | `demo/drizzle.tsx` | Không                                                                                      |
-| `/api/auth/*`   | `api/auth/$.ts`    | Không phải trang — handler API của Better Auth, tự xử lý xác thực nội bộ theo từng request |
-| root shell      | `__root.tsx`       | Không — chỉ render `Header`/`Footer` bao ngoài, không có `beforeLoad`                      |
+| Route         | File            | Cần đăng nhập?                                                                             |
+| ------------- | --------------- | ------------------------------------------------------------------------------------------ |
+| `/`           | `index.tsx`     | Không                                                                                      |
+| `/about`      | `about.tsx`     | Không                                                                                      |
+| `/login`      | `login.tsx`     | Không (route công khai — chính là nơi để đăng nhập)                                        |
+| `/api/auth/*` | `api/auth/$.ts` | Không phải trang — handler API của Better Auth, tự xử lý xác thực nội bộ theo từng request |
+| root shell    | `__root.tsx`    | Không — chỉ render `Header`/`Footer` bao ngoài, không có `beforeLoad`                      |
 
 Không route nào dùng `beforeLoad`, `redirect`, hay bất kỳ guard nào chặn người dùng chưa đăng nhập. Duy nhất `login.tsx` gọi `authClient.useSession()` — nhưng chỉ để hiển thị thông báo "You're signed in as …" khi đã đăng nhập (UX phụ, không redirect, không ẩn form), không phải guard chặn truy cập.
 
-**Phát hiện thêm (ngoài phạm vi task này, không sửa ở đây):** `/demo/drizzle` trả `500` khi kiểm thử `curl`, kể cả có/không có cookie — **không phải do guard đăng nhập** (không redirect, không `401`/`403`, đúng là lỗi server `500`). Nguyên nhân: bảng `todos` không tồn tại trong Postgres (`\dt` chỉ thấy `account`, `session`, `user`, `verification` — 4 bảng của Better Auth, chưa từng chạy migration/push cho schema `todos` gốc của starter). Route demo không liên quan gì đến login/auth nên không sửa trong task này; ghi lại để không hiểu nhầm là kết quả rà soát bị nhiễu bởi lỗi này.
+**Phát hiện thêm trong lúc rà soát:** `/demo/drizzle` trả `500` khi kiểm thử `curl`, kể cả có/không có cookie — **không phải do guard đăng nhập** (không redirect, không `401`/`403`, đúng là lỗi server `500`). Nguyên nhân: bảng `todos` không tồn tại trong Postgres (`\dt` chỉ thấy `account`, `session`, `user`, `verification` — 4 bảng của Better Auth, chưa từng chạy migration/push cho schema `todos` gốc của starter). Không liên quan gì đến login/auth, nhưng do route hỏng và không còn giá trị demo (chưa từng migrate DB thật cho nó) nên đã **xoá hẳn** `src/routes/demo/drizzle.tsx` và mục "Demos" (chỉ có đúng một mục trỏ tới route này) khỏi `header.tsx` theo yêu cầu — xác nhận qua Playwright MCP: `/demo/drizzle` giờ trả `404` (trang not-found tuỳ chỉnh), header không còn dropdown "Demos", không lỗi console.
+
+Còn sót lại (không xoá trong task này, ngoài phạm vi rà soát route): `src/db/index.ts`, `src/db/schema.ts` (định nghĩa bảng `todos`), `drizzle.config.ts`, và các script `db:generate`/`db:migrate`/`db:studio` trong `package.json` giờ không còn nơi nào dùng tới — mồ côi hoàn toàn sau khi xoá route. Để lại quyết định xoá toàn bộ scaffolding Drizzle này cho một task riêng, vì đây là quyết định lớn hơn phạm vi "rà soát route" (có thể vẫn muốn giữ Drizzle cho nhu cầu ORM thật sau này).
 
 **Tiêu chí tham chiếu cho feature sau này** (đám mây, tài liệu): route/luồng cục bộ (mở, xem, sửa, tải về tài liệu trên máy) **không bao giờ** được thêm `beforeLoad` redirect sang `/login` hay điều kiện dựa trên `useSession` để ẩn/chặn nội dung — chỉ hành động chủ động "tải lên đám mây"/"chia sẻ" mới được yêu cầu đăng nhập, đúng bất biến ở `docs/ARCHITECTURE.md` và `CLAUDE.md` ("riêng tư là mặc định, chia sẻ là lựa chọn"). Khi feature tài liệu cục bộ ra đời, chạy lại rà soát này (cùng tiêu chí bảng trên) trước khi thêm bất kỳ route đám mây có guard thật.
