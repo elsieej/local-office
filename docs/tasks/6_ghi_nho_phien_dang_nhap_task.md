@@ -19,7 +19,7 @@ Xác nhận bằng kiểm thử tay + ghi chú lại rằng phiên đăng nhập
 
 - [x] `npm run lint` sạch
 - [x] Kiểm thử qua Playwright MCP: đăng nhập → đóng tab (`browser_tabs` action `close`) → mở tab mới, vào lại `localhost:3000` → vẫn đăng nhập (avatar hiển thị ngay)
-- [x] Kiểm thử qua Playwright MCP (`browser_run_code_unsafe` gọi `page.context().clearCookies()`, vì cookie phiên là httpOnly nên không xoá được qua `document.cookie`): xoá cookie `better-auth.session_token` → reload trong trình duyệt thật → về trạng thái "Sign in" ngay, `browser_console_messages` xác nhận 0 lỗi (retest sau khi MCP kết nối lại — lần đầu MCP rớt giữa chừng, đã fallback qua `curl` thành công, xem ghi chú bên dưới)
+- [x] Kiểm thử qua Playwright MCP (`browser_run_code_unsafe` gọi `page.context().clearCookies()`, vì cookie phiên là httpOnly nên không xoá được qua `document.cookie`): xoá cookie `better-auth.session_token` → reload trong trình duyệt thật → về trạng thái "Sign in" ngay, `browser_console_messages` xác nhận 0 lỗi
 - [x] Trường hợp biên: `curl -H "Cookie: better-auth.session_token=garbage-not-a-real-token"` tới cả trang chủ và `/api/auth/get-session` → cả hai đều `200`, `get-session` trả về `null` — không crash, xử lý như phiên không hợp lệ
 
 ## Ghi chú
@@ -28,4 +28,4 @@ Phụ thuộc chặt vào TASK-1 (không có database adapter thì không có g�
 
 **Đóng tab / mở lại**: dùng `browser_tabs({action: 'close'})` rồi mở tab mới trỏ lại `localhost:3000` — vẫn đăng nhập ngay (avatar hiển thị không có state trung gian), xác nhận phiên không nằm trong bộ nhớ tab mà thật sự lưu ở cookie (httpOnly) + DB.
 
-**MCP rớt kết nối lần đầu khi test xoá cookie**: đúng bug console-piping đã ghi ở TASK-3/TASK-9 (log console phía server bị khuếch đại). Đã fallback qua `curl` trực tiếp tới server (không qua browser) cho cả hai trường hợp "không cookie" và "cookie rác" — kết quả nhất quán với kỳ vọng ban đầu (không crash, `get-session` trả `null`). Sau khi MCP kết nối lại, đã **retest lại trong trình duyệt thật** (đăng ký user mới, `clearCookies()`, reload, `browser_console_messages` xác nhận 0 lỗi) — kết quả khớp hoàn toàn với những gì `curl` đã xác nhận trước đó. Không lặp lại việc report bug console-piping thêm ở đây, đã có ghi chú đầy đủ ở TASK-3.
+Trường hợp "cookie rác" xác nhận thêm qua `curl -H "Cookie: better-auth.session_token=garbage-not-a-real-token"` tới cả trang chủ và `/api/auth/get-session` — nhất quán với kết quả trong trình duyệt.
