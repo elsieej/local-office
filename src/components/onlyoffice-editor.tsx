@@ -41,6 +41,28 @@ function getResolvedUiTheme(): 'theme-classic-light' | 'theme-dark' {
     : 'theme-classic-light'
 }
 
+// ONLYOFFICE tự cache theme UI đã chọn vào `localStorage['ui-theme-id']`
+// (cùng origin, dùng chung với LocalOffice) và ĐỌC CACHE NÀY TRƯỚC — chỉ
+// dùng `customization.uiTheme` truyền vào nếu chưa có cache (xem
+// `window.uitheme.set_id(localstorage.getItem('ui-theme-id'))` chạy trước
+// nhánh đọc `params.uitheme` trong index.html đã vendor). Một khi editor
+// mở lần đầu ở theme nào, mọi lần mở sau bị "kẹt" ở đúng theme đó bất kể
+// LocalOffice đang sáng hay tối — đây là nguyên nhân thật của việc theme
+// tối "không lên hình" ở TASK-23 (nhầm là lỗi hiển thị sâu trong
+// ONLYOFFICE, thực ra là cache theme cũ đè lên param mới). Ghi đè cache
+// này khớp với theme vừa tính TRƯỚC khi tạo DocEditor (iframe đọc
+// localStorage lúc bootstrap, đồng bộ vì cùng origin) để cache không bao
+// giờ lệch với LocalOffice.
+function syncOnlyofficeThemeCache(theme: 'theme-classic-light' | 'theme-dark') {
+  try {
+    window.localStorage.setItem('ui-theme-id', theme)
+  } catch {
+    // localStorage có thể bị chặn (chế độ riêng tư nghiêm ngặt) — bỏ qua,
+    // ONLYOFFICE tự rơi về `params.uitheme` như bình thường khi không đọc
+    // được cache.
+  }
+}
+
 type OnlyofficeEditorProps = {
   file: File
   /** Đuôi file không có dấu chấm, vd "docx" — dùng làm input cho x2t. */
@@ -153,8 +175,10 @@ export default function OnlyofficeEditor({
       const doc = server.getDocument()
       const user = server.getUser()
       const documentType = getDocumentType(doc.fileType)
+      const uiTheme = getResolvedUiTheme()
 
       server.setClient({ buildVersion: window.DocsAPI.DocEditor.version() })
+      syncOnlyofficeThemeCache(uiTheme)
 
       editor = new window.DocsAPI.DocEditor(PLACEHOLDER_ID, {
         // Không set thì api.js tự chèn thư mục phiên bản kiểu
@@ -183,7 +207,7 @@ export default function OnlyofficeEditor({
           coEditing: { mode: 'fast', change: false },
           user: { ...user },
           customization: {
-            uiTheme: getResolvedUiTheme(),
+            uiTheme,
             features: { spellcheck: { change: false } },
             logo: {
               image: LOGO_LIGHT_URL,

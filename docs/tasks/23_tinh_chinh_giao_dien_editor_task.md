@@ -110,9 +110,17 @@ lại (đo bằng JS — `getBoundingClientRect().top` của container trừ
 đang xem tài liệu `.docx`; thiết kế lại trang chi tiết (TopBar gọn, bỏ
 header/nav/footer site).
 
-**Đồng bộ theme sáng/tối — thử nhưng không lên hình, tách khỏi phạm vi
-task này (TASK-24)**. Ghi lại chi tiết vì code chuẩn bị (đọc/map theme) đã
-merge cùng task này dù không đạt mục tiêu hiển thị:
+**Đính chính (ghi lại ở TASK-24, đọc chi tiết ở đó)**: kết luận dưới đây
+("giao diện vẫn hiện màu sáng") là **chẩn đoán sai do cache** — ONLYOFFICE
+tự cache theme UI vào `localStorage['ui-theme-id']` (cùng origin) và đọc
+cache đó TRƯỚC `customization.uiTheme` truyền vào, nên tuỳ lịch sử mở
+trước đó của trình duyệt, theme mới truyền vào có thể bị bỏ qua hoàn toàn
+— không phải lỗi hiển thị sâu trong ONLYOFFICE như đoán ban đầu. TASK-24
+xác nhận theme tối **có** lên hình đúng khi cache sạch, và sửa cho
+`customization.uiTheme` luôn thắng cache cũ. Giả thuyết "chung nguyên nhân
+`child.setAttribute is not a function`" ở cuối phần dưới đây cũng bị rút
+lại — không liên quan tới theme (xem TASK-24). Giữ nguyên nội dung gốc bên
+dưới để lưu lại quá trình điều tra lúc đó:
 
 - `getResolvedUiTheme()` trả đúng `'theme-dark'` khi `document.documentElement`
   có class `dark` (xác nhận qua `console.log` tạm thời lúc debug, đã gỡ)
