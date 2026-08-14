@@ -32,7 +32,13 @@
 - [x] [TASK-20: LICENSE AGPL-3.0 + trang "Tải mã nguồn"](../tasks/20_license_agpl_trang_nguon_task.md) · #41
 - [x] [TASK-21: Mở `.docx` ở mode Xem qua `DocEditor`](../tasks/21_mo_docx_mode_xem_task.md) · #43
 - [x] [TASK-22: 2 nút Xem/Sửa, chuyển mode, xác nhận thay đổi chưa lưu](../tasks/22_nut_xem_sua_chuyen_mode_task.md) · #45
-- [ ] TASK-23: Lưu khứ hồi vào OPFS + đo network payload/egress thật — chưa viết task doc
+- [x] [TASK-23: Tinh chỉnh giao diện editor ONLYOFFICE (logo, kích thước, bố cục trang)](../tasks/23_tinh_chinh_giao_dien_editor_task.md) · #47
+- [ ] TASK-24: Đồng bộ theme sáng/tối của editor ONLYOFFICE — tách ra từ
+      TASK-23 (thử nhưng không lên hình, xem Ghi chú task đó), cần vá lỗi
+      DOM injection `child.setAttribute is not a function` đã ghi từ
+      TASK-21 — chưa viết task doc
+- [ ] TASK-25: Lưu khứ hồi vào OPFS + đo network payload/egress thật —
+      chưa viết task doc
 
 ## Ghi chú
 
@@ -47,19 +53,18 @@ Vì vậy tách 1 task-sketch ban đầu ("tích hợp DocEditor + 2 nút Xem/S�
 thành 3: TASK-21 chỉ dựng lớp giả lập + mở được `.docx` ở mode Xem (rủi ro
 kỹ thuật lớn nhất, phải xong trước thì phần sau mới có ý nghĩa); TASK-22
 thêm UI (2 nút, chuyển mode, xác nhận rời trang) — thuần UI, không rủi ro
-kỹ thuật thêm; TASK-23 làm lưu thật + đo lường (cần editor chạy thật để đo
-đúng chỉ số của "Mong muốn").
+kỹ thuật thêm; TASK-25 làm lưu thật + đo lường (cần editor chạy thật để đo
+đúng chỉ số của "Mong muốn"). TASK-23 (polish giao diện: logo, kích thước,
+bố cục trang) chèn thêm sau TASK-22 theo yêu cầu phát sinh của người dùng
+— không nằm trong tách nhỏ ban đầu, cũng thuần UI không rủi ro kỹ thuật.
+Đồng bộ theme sáng/tối ban đầu cũng định làm trong TASK-23 nhưng không lên
+hình được (nghi lỗi hiển thị sâu trong ONLYOFFICE) nên tách riêng thành
+TASK-24, chờ điều tra thêm.
 
 Lớp giả lập ở TASK-21 chuyển thể (adapt) từ mã nguồn AGPL-3.0 của
 [baotlake/office-website](https://github.com/baotlake/office-website)
 (`utils/editor/*.ts`) — cùng giấy phép với LocalOffice từ TASK-20, ghi rõ
 nguồn ở đầu từng file chuyển thể.
-
-**Việc nên làm thêm ở TASK-22** (không chặn, chỉ ghi lại để không quên):
-đổi logo ONLYOFFICE ở góc trái toolbar editor thành brand LocalOffice qua
-`customization.logo` trong config `DocEditor` (cùng cơ chế
-`office-website` đã dùng) — cần tạo asset logo trước (repo hiện chưa có
-file logo hình ảnh, chỉ có text "LocalOffice").
 
 ## Xong khi
 

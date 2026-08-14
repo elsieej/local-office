@@ -27,6 +27,19 @@ import { createXHRProxy } from '#/lib/onlyoffice/xhr-proxy'
 const PLACEHOLDER_ID = 'onlyoffice-editor-placeholder'
 const API_JS_URL = APP_ROOT + API_JS
 const PRELOAD_URL = APP_ROOT + PRELOAD_HTML
+const LOGO_LIGHT_URL = '/logo-name_black.svg'
+const LOGO_DARK_URL = '/logo-name_white.svg'
+
+// `theme-toggle.tsx` ghi thẳng vào documentElement.classList (không có
+// store/hook riêng để dùng lại) — đọc lại đúng cách đó, tại thời điểm mount
+// editor. Không phản ứng real-time nếu người dùng đổi theme hệ điều hành
+// trong lúc editor đang mở (đổi mode đã ép remount toàn bộ — xem
+// $documentId.tsx — nên đổi theme khi quay lại vẫn khớp đúng lần mount sau).
+function getResolvedUiTheme(): 'theme-classic-light' | 'theme-dark' {
+  return document.documentElement.classList.contains('dark')
+    ? 'theme-dark'
+    : 'theme-classic-light'
+}
 
 type OnlyofficeEditorProps = {
   file: File
@@ -45,6 +58,24 @@ export default function OnlyofficeEditor({
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const isDirtyRef = useRef(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [containerHeight, setContainerHeight] = useState<number | null>(null)
+
+  // Lấp phần viewport còn lại thay vì cố định chiều cao — đo bằng JS (thay
+  // vì CSS thuần) vì chiều cao header/card phía trên nằm ở component khác,
+  // không có cách CSS nào biết trước để trừ ra mà không phải sửa layout gốc
+  // của cả app.
+  useEffect(() => {
+    function updateHeight() {
+      const el = containerRef.current
+      if (!el) return
+      const top = el.getBoundingClientRect().top
+      setContainerHeight(Math.max(400, window.innerHeight - top - 16))
+    }
+    updateHeight()
+    window.addEventListener('resize', updateHeight)
+    return () => window.removeEventListener('resize', updateHeight)
+  }, [])
 
   useBlocker({
     shouldBlockFn: () => {
@@ -53,6 +84,12 @@ export default function OnlyofficeEditor({
         'Tài liệu có thay đổi chưa lưu. Rời trang và bỏ các thay đổi này?',
       )
     },
+    // Mặc định `enableBeforeUnload` là `true` (không điều kiện) — nghĩa là
+    // đóng tab/reload luôn hiện cảnh báo của trình duyệt bất kể có thay đổi
+    // chưa lưu hay không, kể cả ở mode Xem không bao giờ dirty. Phải truyền
+    // hàm để chỉ bật đúng lúc đang dirty thật (phát hiện lúc kiểm thử
+    // TASK-23, lỗi có từ TASK-22).
+    enableBeforeUnload: () => isDirtyRef.current,
   })
 
   useEffect(() => {
@@ -146,8 +183,13 @@ export default function OnlyofficeEditor({
           coEditing: { mode: 'fast', change: false },
           user: { ...user },
           customization: {
-            uiTheme: 'theme-classic-light',
+            uiTheme: getResolvedUiTheme(),
             features: { spellcheck: { change: false } },
+            logo: {
+              image: LOGO_LIGHT_URL,
+              imageDark: LOGO_DARK_URL,
+              url: '/',
+            },
           },
         },
         events: {
@@ -239,7 +281,11 @@ export default function OnlyofficeEditor({
   }
 
   return (
-    <div className="relative h-[75vh] w-full overflow-hidden rounded-lg border">
+    <div
+      ref={containerRef}
+      className="relative h-[75vh] w-full overflow-hidden rounded-lg border"
+      style={containerHeight ? { height: containerHeight } : undefined}
+    >
       {status === 'loading' && (
         <Skeleton className="absolute inset-0 h-full w-full" />
       )}

@@ -6,6 +6,7 @@ import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
+  useRouterState,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
@@ -72,6 +73,12 @@ function NotFound() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { queryClient } = Route.useRouteContext()
+  // Trang chi tiết tài liệu tự vẽ thanh trên riêng (tên file + hành động,
+  // xem $documentId.tsx) và cần chừa gần hết viewport cho editor ONLYOFFICE
+  // — header/footer của site (nav, footer) ở đây chỉ choán chỗ vô ích.
+  const isDocumentDetail = useRouterState({
+    select: (state) => state.location.pathname.startsWith('/documents/'),
+  })
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -81,9 +88,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="font-sans antialiased [overflow-wrap:anywhere]">
         <QueryClientProvider client={queryClient}>
-          <Header />
+          {!isDocumentDetail && <Header />}
           {children}
-          <Footer />
+          {!isDocumentDetail && <Footer />}
           <TanStackDevtools
             config={{
               position: 'bottom-right',
