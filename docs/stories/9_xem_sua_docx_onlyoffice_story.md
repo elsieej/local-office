@@ -33,11 +33,17 @@
 - [x] [TASK-21: Mở `.docx` ở mode Xem qua `DocEditor`](../tasks/21_mo_docx_mode_xem_task.md) · #43
 - [x] [TASK-22: 2 nút Xem/Sửa, chuyển mode, xác nhận thay đổi chưa lưu](../tasks/22_nut_xem_sua_chuyen_mode_task.md) · #45
 - [x] [TASK-23: Tinh chỉnh giao diện editor ONLYOFFICE (logo, kích thước, bố cục trang)](../tasks/23_tinh_chinh_giao_dien_editor_task.md) · #47
-- [ ] TASK-24: Đồng bộ theme sáng/tối của editor ONLYOFFICE — tách ra từ
-      TASK-23 (thử nhưng không lên hình, xem Ghi chú task đó), cần vá lỗi
-      DOM injection `child.setAttribute is not a function` đã ghi từ
-      TASK-21 — chưa viết task doc
-- [ ] TASK-25: Lưu khứ hồi vào OPFS + đo network payload/egress thật —
+- [x] [TASK-24: Đồng bộ theme sáng/tối của editor ONLYOFFICE với LocalOffice](../tasks/24_dong_bo_theme_editor_task.md) · #49 —
+      điều tra lại TASK-23: theme tối thật ra lên hình đúng, TASK-23 kết
+      luận sai do `localStorage['ui-theme-id']` của ONLYOFFICE cache theme
+      cũ; sửa cho theme LocalOffice luôn thắng cache, xem Ghi chú task đó
+- [ ] TASK-25: Vá lỗi `fetch`/`XHR` proxy tạo `Request`/`URL` bằng
+      constructor của window chính thay vì của iframe editor — URL tương
+      đối bị tính sai gốc, gây lỗi DOM injection `child.setAttribute is
+    not a function` đã ghi từ TASK-21 (icon HiDPI, dữ liệu spellcheck
+      alphabet) — không liên quan theme, tách khỏi TASK-24 — chưa viết
+      task doc
+- [ ] TASK-26: Lưu khứ hồi vào OPFS + đo network payload/egress thật —
       chưa viết task doc
 
 ## Ghi chú
@@ -53,13 +59,15 @@ Vì vậy tách 1 task-sketch ban đầu ("tích hợp DocEditor + 2 nút Xem/S�
 thành 3: TASK-21 chỉ dựng lớp giả lập + mở được `.docx` ở mode Xem (rủi ro
 kỹ thuật lớn nhất, phải xong trước thì phần sau mới có ý nghĩa); TASK-22
 thêm UI (2 nút, chuyển mode, xác nhận rời trang) — thuần UI, không rủi ro
-kỹ thuật thêm; TASK-25 làm lưu thật + đo lường (cần editor chạy thật để đo
+kỹ thuật thêm; TASK-26 làm lưu thật + đo lường (cần editor chạy thật để đo
 đúng chỉ số của "Mong muốn"). TASK-23 (polish giao diện: logo, kích thước,
 bố cục trang) chèn thêm sau TASK-22 theo yêu cầu phát sinh của người dùng
 — không nằm trong tách nhỏ ban đầu, cũng thuần UI không rủi ro kỹ thuật.
-Đồng bộ theme sáng/tối ban đầu cũng định làm trong TASK-23 nhưng không lên
-hình được (nghi lỗi hiển thị sâu trong ONLYOFFICE) nên tách riêng thành
-TASK-24, chờ điều tra thêm.
+Đồng bộ theme sáng/tối ban đầu cũng định làm trong TASK-23 nhưng lúc đó
+kết luận nhầm là "không lên hình được" (thật ra do cache theme cũ của
+ONLYOFFICE, xem TASK-24) nên tách riêng thành TASK-24; điều tra TASK-24
+lại lộ ra một lỗi thật khác không liên quan theme (`fetch`/`XHR` proxy
+tính sai gốc URL tương đối của iframe editor), tách tiếp thành TASK-25.
 
 Lớp giả lập ở TASK-21 chuyển thể (adapt) từ mã nguồn AGPL-3.0 của
 [baotlake/office-website](https://github.com/baotlake/office-website)
