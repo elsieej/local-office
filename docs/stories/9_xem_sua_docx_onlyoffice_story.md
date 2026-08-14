@@ -37,12 +37,10 @@
       điều tra lại TASK-23: theme tối thật ra lên hình đúng, TASK-23 kết
       luận sai do `localStorage['ui-theme-id']` của ONLYOFFICE cache theme
       cũ; sửa cho theme LocalOffice luôn thắng cache, xem Ghi chú task đó
-- [ ] TASK-25: Vá lỗi `fetch`/`XHR` proxy tạo `Request`/`URL` bằng
-      constructor của window chính thay vì của iframe editor — URL tương
-      đối bị tính sai gốc, gây lỗi DOM injection `child.setAttribute is
-    not a function` đã ghi từ TASK-21 (icon HiDPI, dữ liệu spellcheck
-      alphabet) — không liên quan theme, tách khỏi TASK-24 — chưa viết
-      task doc
+- [x] [TASK-25: Vá lỗi `fetch`/`XHR` proxy resolve URL tương đối sai (window chính, không phải iframe editor)](../tasks/25_vendor_proxy_realm_task.md) · #51 —
+      sửa lỗi DOM injection `child.setAttribute is not a function` đã ghi
+      từ TASK-21 (icon HiDPI, dữ liệu spellcheck alphabet), không liên
+      quan theme, xem Ghi chú task đó
 - [ ] TASK-26: Lưu khứ hồi vào OPFS + đo network payload/egress thật —
       chưa viết task doc
 

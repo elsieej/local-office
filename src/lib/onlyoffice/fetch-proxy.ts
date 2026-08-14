@@ -12,15 +12,22 @@ export type FetchProxy = typeof fetch & {
 }
 
 export function createFetchProxy(
-  target: Window & { fetch: typeof fetch },
+  target: Window & typeof globalThis,
 ): FetchProxy {
   const middlewares: Array<XHRMiddleware> = []
   const baseFetch = target.fetch.bind(target)
+  // `Request` toàn cục ở module này là của window CHÍNH (nơi bundle app
+  // được nạp), không phải của iframe editor — dùng nó để resolve URL
+  // tương đối sẽ tính base URL theo trang LocalOffice (vd
+  // `/documents/<id>`) thay vì theo trang thật của iframe
+  // (`/onlyoffice/web-apps/...`), làm sai lệch cả path lẫn origin. Phải
+  // dùng đúng `Request` của `target` (iframe) để base URL khớp iframe.
+  const TargetRequest = target.Request
 
   const proxy = (async (input: RequestInfo | URL, init?: RequestInit) => {
     let request: Request
     try {
-      request = new Request(input, init)
+      request = new TargetRequest(input, init)
     } catch {
       return baseFetch(input, init)
     }
