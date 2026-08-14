@@ -11,7 +11,13 @@ export interface XHRMiddleware {
   (request: Request): Response | null | Promise<Response | null>
 }
 
-export function createXHRProxy(BaseXHR: typeof XMLHttpRequest) {
+export function createXHRProxy(
+  BaseXHR: typeof XMLHttpRequest,
+  // `Request` của đúng iframe editor — xem giải thích trong
+  // fetch-proxy.ts. Cần truyền riêng vì `Request` toàn cục ở module này
+  // là của window chính, resolve URL tương đối sai base nếu dùng thẳng.
+  TargetRequest: typeof Request,
+) {
   return class ProxyXMLHttpRequest extends BaseXHR {
     private static _middlewares: Array<XHRMiddleware> = []
 
@@ -83,7 +89,7 @@ export function createXHRProxy(BaseXHR: typeof XMLHttpRequest) {
         if (this.withCredentials) {
           reqInit.credentials = 'include'
         }
-        request = new Request(this._requestUrl, reqInit)
+        request = new TargetRequest(this._requestUrl, reqInit)
       } catch {
         return false
       }

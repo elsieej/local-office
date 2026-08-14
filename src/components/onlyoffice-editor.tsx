@@ -145,7 +145,7 @@ export default function OnlyofficeEditor({
         return
       }
 
-      const xhr = createXHRProxy(win.XMLHttpRequest)
+      const xhr = createXHRProxy(win.XMLHttpRequest, win.Request)
       const fetchProxy = createFetchProxy(win)
       const BaseWorker = win.Worker
 

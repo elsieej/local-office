@@ -391,8 +391,24 @@ export class EditorServer {
       return Response.json({ [pathname]: url })
     }
 
-    if (u.pathname === '/plugins.json') {
+    // `.endsWith` thay vì so khớp tuyệt đối: trước khi vá lỗi "sai realm"
+    // của fetch/XHR proxy (xem TASK-25), 2 request này luôn bị tính URL
+    // tương đối sai, tình cờ rơi đúng gốc site LocalOffice (`/plugins.json`,
+    // `/themes.json`) — từng "vá" bằng cách đặt sẵn 1 file tĩnh
+    // `public/themes.json` khớp đúng chỗ sai đó (TASK-23). Sau khi vá đúng
+    // realm, 2 request này resolve đúng theo gốc thật của iframe editor
+    // (`/onlyoffice/plugins.json`, `/onlyoffice/themes.json`) — không phải
+    // đường dẫn thật trong bản đã vendor (`web-apps/apps/common/main/
+    // resources/themes/themes.json`) nên vẫn không có file tĩnh nào khớp.
+    // Trả lời thẳng ở đây (đúng vai "giả lập Document Server" của file
+    // này) thay vì tiếp tục đoán đường dẫn tĩnh — không phụ thuộc cách
+    // request được resolve.
+    if (u.pathname.endsWith('/plugins.json')) {
       return Response.json({ url: '', pluginsData: [], autostart: [] })
+    }
+
+    if (u.pathname.endsWith('/themes.json')) {
+      return Response.json({ themes: [] })
     }
 
     return null
