@@ -42,11 +42,11 @@
       sửa lỗi DOM injection `child.setAttribute is not a function` đã ghi
       từ TASK-21 (icon HiDPI, dữ liệu spellcheck alphabet), không liên
       quan theme, xem Ghi chú task đó
-- [ ] [TASK-26: Lưu khứ hồi thật vào OPFS khi bấm "Lưu" trong editor](../tasks/26_luu_khu_hoi_opfs_task.md) · #53
+- [x] [TASK-26: Lưu khứ hồi thật vào OPFS khi bấm "Lưu" trong editor](../tasks/26_luu_khu_hoi_opfs_task.md) · #53
 - [ ] TASK-27: Đo network payload/egress thật (kế thừa US-8) — cần TASK-26
       xong trước để đo đúng luồng lưu — chưa viết task doc
-- [ ] [TASK-28: Ô tìm kiếm trên header, highlight trực tiếp trong tài liệu](../tasks/28_o_tim_kiem_header_task.md) · #56
-- [ ] [TASK-29: Vá lỗi `insertBefore` khi tab được focus lại trong lúc đang mở `.docx`](../tasks/29_fix_insertbefore_refetch_task.md) · #58 —
+- [x] [TASK-28: Ô tìm kiếm trên header, highlight trực tiếp trong tài liệu](../tasks/28_o_tim_kiem_header_task.md) · #56
+- [x] [TASK-29: Vá lỗi `insertBefore` khi tab được focus lại trong lúc đang mở `.docx`](../tasks/29_fix_insertbefore_refetch_task.md) · #58 —
       phát sinh ngoài kế hoạch, người dùng báo cáo trực tiếp, không thuộc
       chuỗi tách nhỏ ban đầu
 

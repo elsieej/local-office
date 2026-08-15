@@ -2,7 +2,7 @@
 
 **Story:** [US-9](../stories/9_xem_sua_docx_onlyoffice_story.md)
 **Issue:** #58 · **Nhánh:** `fix/insertbefore-refetch-focus`
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 

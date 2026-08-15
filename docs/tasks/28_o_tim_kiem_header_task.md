@@ -2,7 +2,7 @@
 
 **Story:** [US-9](../stories/9_xem_sua_docx_onlyoffice_story.md)
 **Issue:** #56 · **Nhánh:** `feat/o-tim-kiem-header`
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Story:** [US-9](../stories/9_xem_sua_docx_onlyoffice_story.md)
 **Issue:** #53 · **Nhánh:** `feat/luu-khu-hoi-opfs`
-**Trạng thái:** 🔵 Chờ review
+**Trạng thái:** ✅ Xong
 
 ---
 
