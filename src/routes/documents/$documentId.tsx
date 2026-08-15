@@ -93,6 +93,13 @@ function DocumentDetailPage() {
     queryKey: [...DOCUMENTS_QUERY_KEY, documentId, 'bytes'],
     queryFn: () => openDocument(documentId),
     enabled: isPdf || isWord,
+    // Không bao giờ tự stale — bytes chỉ đổi khi chính app này ghi qua
+    // mutation (saveMutation, đã tự invalidate đúng lúc, xem comment ở đó).
+    // Không set thì bất kỳ refetch tự động nào (mount lại observer, StrictMode,
+    // v.v., không chỉ window focus đã tắt ở router.tsx) đều tạo `File` mới
+    // trong lúc `OnlyofficeEditor` đang mount → cùng lỗi `insertBefore` đã ghi
+    // ở router.tsx — pin ở đây để đóng triệt để, không chỉ chặn 1 trigger.
+    staleTime: Infinity,
   })
 
   const deleteMutation = useMutation({
