@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
@@ -7,6 +7,7 @@ import {
   EyeIcon,
   EyeOffIcon,
   PencilIcon,
+  SearchIcon,
   Trash2Icon,
 } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert'
@@ -18,10 +19,12 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '#/components/ui/empty'
+import { Input } from '#/components/ui/input'
 import { Skeleton } from '#/components/ui/skeleton'
 import DocumentKindIcon from '#/components/document-kind-icon'
 import DocumentStateBadge from '#/components/document-state-badge'
 import OnlyofficeEditor from '#/components/onlyoffice-editor'
+import type { OnlyofficeEditorHandle } from '#/components/onlyoffice-editor'
 import PdfViewer from '#/components/pdf-viewer'
 import {
   DOCUMENTS_QUERY_KEY,
@@ -125,6 +128,29 @@ function DocumentDetailPage() {
     },
   })
 
+  // Ô tìm kiếm trên header: dùng lại "engine" tìm/highlight có sẵn của
+  // DocEditor qua ref (xem OnlyofficeEditorHandle.search), không tự parse
+  // nội dung tài liệu. `editorReady` cần vì editor tải bất đồng bộ — gọi
+  // `search` trước khi tài liệu hiện xong sẽ vô tác dụng.
+  const editorRef = useRef<OnlyofficeEditorHandle>(null)
+  const [editorReady, setEditorReady] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // `key={mode}` bên dưới ép remount OnlyofficeEditor mỗi lần đổi mode —
+  // reset lại ô tìm kiếm theo, tránh giữ query cũ trỏ vào 1 editor đã huỷ.
+  useEffect(() => {
+    setEditorReady(false)
+    setSearchQuery('')
+  }, [mode])
+
+  useEffect(() => {
+    if (!editorReady) return
+    const id = setTimeout(() => {
+      editorRef.current?.search(searchQuery)
+    }, 300)
+    return () => clearTimeout(id)
+  }, [searchQuery, editorReady])
+
   // Trang này không dùng <Header/> của site (xem __root.tsx) nên tên file
   // trong tab trình duyệt là nơi duy nhất còn lại để nhận ra tài liệu đang
   // mở — khôi phục lại title mặc định khi rời trang.
@@ -187,6 +213,19 @@ function DocumentDetailPage() {
         />
         <h1 className="truncate text-base font-medium">{doc.name}</h1>
         <DocumentStateBadge state={doc.state} />
+        {isWord && fileQuery.data && (
+          <div className="relative w-40 sm:w-56">
+            <SearchIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2" />
+            <Input
+              type="search"
+              placeholder={editorReady ? 'Tìm trong tài liệu' : 'Đang tải…'}
+              disabled={!editorReady}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        )}
         <div className="ml-auto flex flex-wrap gap-2">
           {isWord && mode === 'view' && (
             <Button
@@ -255,6 +294,7 @@ function DocumentDetailPage() {
           // unmount/mount lại toàn bộ, luôn có DOM sạch cho DocEditor mới.
           <OnlyofficeEditor
             key={mode}
+            ref={editorRef}
             file={fileQuery.data}
             fileType={doc.extension.slice(1)}
             title={doc.name}
@@ -262,6 +302,7 @@ function DocumentDetailPage() {
             onSave={async (file) => {
               await saveMutation.mutateAsync(file)
             }}
+            onReady={() => setEditorReady(true)}
           />
         )}
 
