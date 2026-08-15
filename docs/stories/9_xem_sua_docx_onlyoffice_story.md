@@ -19,8 +19,8 @@
 - [x] Bấm "Sửa" → trang chi tiết khởi tạo `DocEditor` ở mode edit, gõ/sửa được nội dung
 - [x] Đang ở mode Xem, có nút "Chuyển sang Sửa" ngay trên trang chi tiết → huỷ editor cũ, khởi tạo lại ở mode edit, không cần quay lại danh sách
 - [x] Đang ở mode Sửa có thay đổi chưa lưu, người dùng rời trang (quay lại danh sách, chuyển sang mode Xem, đóng tab) → xác nhận qua `window.confirm` trước khi huỷ, giống mẫu đã dùng ở nút Xoá
-- [ ] Sửa xong, bấm lưu → file cập nhật lại trong OPFS (vẫn 🔒 Cục bộ), không có request nào gửi nội dung ra ngoài máy
-- [ ] Tải về sau khi sửa → file `.docx` mở được bằng Microsoft Office, giữ đúng nội dung đã sửa (khứ hồi thật, không mất định dạng)
+- [x] Sửa xong, bấm lưu → file cập nhật lại trong OPFS (vẫn 🔒 Cục bộ), không có request nào gửi nội dung ra ngoài máy
+- [x] Tải về sau khi sửa → file `.docx` mở được bằng Microsoft Office, giữ đúng nội dung đã sửa (khứ hồi thật, không mất định dạng)
 - [ ] `browser_network_requests` trong suốt luồng xem/sửa/lưu: không có request nào ra ngoài domain LocalOffice (kế thừa câu hỏi mở từ US-8 — đo được thật lần đầu ở story này vì cần editor chạy thật)
 - [ ] Đo dung lượng thật trình duyệt tải ở lần mở editor đầu tiên, so với kỳ vọng "vài giây" của `CLAUDE.md` — ghi kết luận rõ ràng dù đạt hay không đạt (kế thừa từ US-8)
 - [x] File `.docx` hỏng/không parse được → báo lỗi rõ, không treo trang, không mất file gốc trong OPFS (kiểm ở TASK-21, mode Xem)
@@ -41,8 +41,9 @@
       sửa lỗi DOM injection `child.setAttribute is not a function` đã ghi
       từ TASK-21 (icon HiDPI, dữ liệu spellcheck alphabet), không liên
       quan theme, xem Ghi chú task đó
-- [ ] TASK-26: Lưu khứ hồi vào OPFS + đo network payload/egress thật —
-      chưa viết task doc
+- [ ] [TASK-26: Lưu khứ hồi thật vào OPFS khi bấm "Lưu" trong editor](../tasks/26_luu_khu_hoi_opfs_task.md) · #53
+- [ ] TASK-27: Đo network payload/egress thật (kế thừa US-8) — cần TASK-26
+      xong trước để đo đúng luồng lưu — chưa viết task doc
 
 ## Ghi chú
 
@@ -57,8 +58,9 @@ Vì vậy tách 1 task-sketch ban đầu ("tích hợp DocEditor + 2 nút Xem/S�
 thành 3: TASK-21 chỉ dựng lớp giả lập + mở được `.docx` ở mode Xem (rủi ro
 kỹ thuật lớn nhất, phải xong trước thì phần sau mới có ý nghĩa); TASK-22
 thêm UI (2 nút, chuyển mode, xác nhận rời trang) — thuần UI, không rủi ro
-kỹ thuật thêm; TASK-26 làm lưu thật + đo lường (cần editor chạy thật để đo
-đúng chỉ số của "Mong muốn"). TASK-23 (polish giao diện: logo, kích thước,
+kỹ thuật thêm; TASK-26 làm lưu thật vào OPFS, TASK-27 đo lường (cần editor
+chạy thật và TASK-26 xong trước để đo đúng chỉ số của "Mong muốn"). TASK-23
+(polish giao diện: logo, kích thước,
 bố cục trang) chèn thêm sau TASK-22 theo yêu cầu phát sinh của người dùng
 — không nằm trong tách nhỏ ban đầu, cũng thuần UI không rủi ro kỹ thuật.
 Đồng bộ theme sáng/tối ban đầu cũng định làm trong TASK-23 nhưng lúc đó

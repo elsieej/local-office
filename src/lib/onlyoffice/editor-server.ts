@@ -86,7 +86,12 @@ export class EditorServer {
 
   private converter = new X2tConverter()
 
-  constructor() {
+  constructor(
+    // Gọi khi DocEditor "downloadas" ở đúng định dạng gốc của tài liệu —
+    // xem giải thích ở handleRequest(). Không set thì rơi về hành vi cũ
+    // (tải file thật xuống máy) cho mọi trường hợp downloadas.
+    private onNativeSave?: (file: File) => void | Promise<void>,
+  ) {
     this.send = this.send.bind(this)
     this.handleConnect = this.handleConnect.bind(this)
     this.handleDisconnect = this.handleDisconnect.bind(this)
@@ -333,6 +338,27 @@ export class EditorServer {
         if (!output) {
           console.error('[EditorServer] Conversion failed')
           return { status: 'error' }
+        }
+
+        // DocEditor gọi "downloadas" cho MỌI trường hợp cần bytes tài liệu
+        // hiện tại — cả bấm "Lưu (Ctrl+S)" lẫn "Tải về dưới dạng <định
+        // dạng khác>" đều đi qua đây, cùng `isSaveAs: false` (xác nhận
+        // bằng thực nghiệm, xem Ghi chú TASK-26) — không có cờ nào phân
+        // biệt được 2 trường hợp. Chỉ có thể phân biệt qua đuôi file đề
+        // xuất trong `cmd.title`: khớp đúng định dạng gốc của tài liệu =
+        // "Lưu" thật (ghi đè lại, không phải xuất sang định dạng khác) —
+        // lưu thẳng vào OPFS, không tải file thật xuống máy (khớp đúng
+        // "Mong muốn" US-9: bấm lưu không phát sinh file tải về bất ngờ).
+        // Khác đuôi = xuất sang định dạng khác, giữ hành vi tải về cũ.
+        const requestedExtension = cmd.title.split('.').pop()?.toLowerCase()
+        const isNativeSave =
+          !!requestedExtension &&
+          requestedExtension === this.fileType.toLowerCase()
+
+        if (isNativeSave && this.onNativeSave) {
+          const file = new File([new Uint8Array(output)], this.title)
+          await this.onNativeSave(file)
+          return { status: 'ok' }
         }
 
         const blob = new Blob([new Uint8Array(output)])

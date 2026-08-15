@@ -28,6 +28,7 @@ import {
   deleteDocument,
   getDocument,
   openDocument,
+  updateDocumentBytes,
 } from '#/lib/documents/store'
 
 type DocumentDetailSearch = {
@@ -96,6 +97,31 @@ function DocumentDetailPage() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: DOCUMENTS_QUERY_KEY })
       void navigate({ to: '/' })
+    },
+  })
+
+  const saveMutation = useMutation({
+    mutationFn: (file: File) => updateDocumentBytes(documentId, file),
+    // Chỉ invalidate 2 query "metadata" (danh sách trang chủ + chi tiết
+    // tài liệu này) để cập nhật `size` hiển thị — CỐ Ý không đụng tới query
+    // 'bytes' (`[...DOCUMENTS_QUERY_KEY, documentId, 'bytes']`). Invalidate
+    // rộng theo prefix (như deleteMutation bên trên) sẽ refetch 'bytes' →
+    // `fileQuery.data` đổi identity → prop `file` mới đưa vào
+    // `OnlyofficeEditor` ĐANG MOUNT → effect tạo editor chạy lại giữa
+    // chừng trong khi DocEditor vẫn còn sở hữu DOM cũ → tranh chấp DOM với
+    // React (chính loại lỗi `insertBefore` đã ghi ở comment `key={mode}`
+    // bên dưới, chỉ khác nguyên nhân) — phát hiện khi kiểm thử task này.
+    // Không cần bytes mới: editor đang sống đã tự có đúng nội dung vừa lưu
+    // trong bộ nhớ của nó, không cần đọc lại từ OPFS.
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: DOCUMENTS_QUERY_KEY,
+        exact: true,
+      })
+      void queryClient.invalidateQueries({
+        queryKey: [...DOCUMENTS_QUERY_KEY, documentId],
+        exact: true,
+      })
     },
   })
 
@@ -233,6 +259,9 @@ function DocumentDetailPage() {
             fileType={doc.extension.slice(1)}
             title={doc.name}
             mode={mode}
+            onSave={async (file) => {
+              await saveMutation.mutateAsync(file)
+            }}
           />
         )}
 
