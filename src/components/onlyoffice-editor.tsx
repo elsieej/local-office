@@ -69,6 +69,8 @@ type OnlyofficeEditorProps = {
   fileType: string
   title: string
   mode: 'view' | 'edit'
+  /** Gọi khi người dùng bấm "Lưu" trong editor — xem EditorServer.onNativeSave. */
+  onSave?: (file: File) => void | Promise<void>
 }
 
 export default function OnlyofficeEditor({
@@ -76,12 +78,22 @@ export default function OnlyofficeEditor({
   fileType,
   title,
   mode,
+  onSave,
 }: OnlyofficeEditorProps) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const isDirtyRef = useRef(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerHeight, setContainerHeight] = useState<number | null>(null)
+
+  // Ref thay vì đưa `onSave` vào deps của effect tạo editor bên dưới —
+  // component cha (`$documentId.tsx`) không memo hàm này, đưa thẳng vào
+  // deps sẽ ép editor unmount/remount lại (mất trạng thái đang gõ) mỗi lần
+  // cha re-render.
+  const onSaveRef = useRef(onSave)
+  useEffect(() => {
+    onSaveRef.current = onSave
+  }, [onSave])
 
   // Lấp phần viewport còn lại thay vì cố định chiều cao — đo bằng JS (thay
   // vì CSS thuần) vì chiều cao header/card phía trên nằm ở component khác,
@@ -117,7 +129,9 @@ export default function OnlyofficeEditor({
   useEffect(() => {
     let cancelled = false
     let editor: DocEditorInstance | null = null
-    const server = new EditorServer()
+    const server = new EditorServer((savedFile) =>
+      onSaveRef.current?.(savedFile),
+    )
     isDirtyRef.current = false
     setStatus('loading')
     setErrorMessage(null)

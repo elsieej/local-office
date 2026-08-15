@@ -4,6 +4,7 @@ import {
 } from '#/constants/document'
 import type { DocumentExtension } from '#/constants/document'
 import {
+  DocumentNotFoundError,
   DocumentTooLargeError,
   UnsupportedDocumentTypeError,
 } from '#/lib/documents/errors'
@@ -72,6 +73,23 @@ export async function getDocument(id: string): Promise<Document | null> {
 
 export function openDocument(id: string): Promise<File> {
   return readDocumentBytes(id)
+}
+
+// Dùng khi editor tự lưu đè lên tài liệu đang mở (không phải upload file
+// mới) — ghi bytes mới vào đúng slot OPFS đã có, cập nhật lại `size` trong
+// metadata (mọi trường khác giữ nguyên, kể cả `openedAt` — đây là lưu, không
+// phải mở lại).
+export async function updateDocumentBytes(
+  id: string,
+  file: File,
+): Promise<Document> {
+  const existing = await getDocumentMeta(id)
+  if (!existing) throw new DocumentNotFoundError(id)
+
+  await writeDocumentBytes(id, file)
+  const updated: Document = { ...existing, size: file.size }
+  await putDocumentMeta(updated)
+  return updated
 }
 
 export async function deleteDocument(id: string): Promise<void> {
