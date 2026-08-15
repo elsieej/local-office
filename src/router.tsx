@@ -8,9 +8,20 @@ export function getRouter() {
   // liệu chỉ nằm trong OPFS/IndexedDB cục bộ nên không cần chờ mạng — nếu
   // không set 'always', các thao tác như xoá tài liệu sẽ treo vô thời hạn khi
   // offline. Xem TASK-17.
+  //
+  // `refetchOnWindowFocus: false`: mặc định `true` của React Query giả định
+  // dữ liệu có thể đổi ở nơi khác (server, tab khác cùng gọi API) trong lúc
+  // tab mất focus — không đúng với LocalOffice, dữ liệu tài liệu chỉ đổi khi
+  // CHÍNH app này ghi qua mutation (đã tự invalidate đúng query cần thiết).
+  // Không tắt cái này thì quay lại tab sau khi rời đi sẽ refetch query
+  // 'bytes' đang nuôi `OnlyofficeEditor` ĐANG MOUNT → `file` prop đổi identity
+  // → effect tạo editor chạy lại giữa chừng trong khi DocEditor vẫn còn sở
+  // hữu DOM cũ → lỗi `insertBefore` (xác nhận bằng thực nghiệm: gọi thẳng
+  // `invalidateQueries` lên query 'bytes' trong lúc editor mount tái hiện lỗi
+  // 100%, xem TASK-29).
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: { networkMode: 'always' },
+      queries: { networkMode: 'always', refetchOnWindowFocus: false },
       mutations: { networkMode: 'always' },
     },
   })

@@ -46,6 +46,9 @@
 - [ ] TASK-27: Đo network payload/egress thật (kế thừa US-8) — cần TASK-26
       xong trước để đo đúng luồng lưu — chưa viết task doc
 - [ ] [TASK-28: Ô tìm kiếm trên header, highlight trực tiếp trong tài liệu](../tasks/28_o_tim_kiem_header_task.md) · #56
+- [ ] [TASK-29: Vá lỗi `insertBefore` khi tab được focus lại trong lúc đang mở `.docx`](../tasks/29_fix_insertbefore_refetch_task.md) · #58 —
+      phát sinh ngoài kế hoạch, người dùng báo cáo trực tiếp, không thuộc
+      chuỗi tách nhỏ ban đầu
 
 ## Ghi chú
 
@@ -101,6 +104,32 @@ không cần phím thật — đã xác nhận: chỉ cần đúng `ctrlKey`/`ke
 quan tâm `isTrusted`) vào `#id_main` của iframe. Đánh đổi đã biết: mất
 bộ đếm "x/y" và nút điều hướng next/prev của panel gốc (đã ẩn theo panel)
 — để lại cho sau nếu cần, phạm vi TASK-28 chỉ cần highlight-khi-gõ.
+
+**TASK-29 — lỗi `insertBefore` khi tab được focus lại**: người dùng báo
+cáo mở `.docx` mode Xem, chuyển tab trình duyệt rồi quay lại thì gặp lỗi
+console `insertBefore`, trang crash. Xác nhận nguyên nhân bằng thực
+nghiệm (Playwright, `queryClient.invalidateQueries` thẳng vào query
+`'bytes'` trong lúc `OnlyofficeEditor` đang mount): `refetchOnWindowFocus`
+mặc định `true` của React Query khiến tab focus lại tự refetch bytes →
+`file` đổi identity → effect tạo editor chạy lại giữa chừng trong khi
+`DocEditor` còn sở hữu DOM cũ → cùng cơ chế đã ghi trong comment của
+`saveMutation` (TASK-26), khác trigger. Vá bằng `refetchOnWindowFocus:
+false` global (`router.tsx`) và `staleTime: Infinity` riêng cho
+`fileQuery` (`$documentId.tsx`) — chặn hẳn mọi nguồn refetch tự động,
+không chỉ window focus.
+
+Trong lúc kiểm thử suýt kết luận nhầm: lần đầu expose `queryClient` qua
+`window.__qc = queryClient` viết thẳng trong thân component (không phải
+`useEffect`) làm vỡ SSR (`window is not defined` trên server) → gây ra
+MỘT lỗi `insertBefore` khác không liên quan (hydration mismatch do SSR
+crash), lẫn với lỗi thật. Sửa cách expose (đưa vào `useEffect`) rồi lặp
+lại mới xác nhận đúng, sạch. Sau đó tìm ra cách tái hiện đúng kịch bản gốc
+(chuyển tab thật) bằng CDP domain `Page.setWebLifecycleState('frozen'/
+'active')` — mô phỏng đúng tính năng tab-freezing thật của Chrome, khác
+hẳn `Emulation.setFocusEmulationEnabled` hay `page.bringToFront()` (cả 2
+đều không kích hoạt được gì trong Chromium headless) — xác nhận bằng
+feedback loop đỏ/xanh thật: tắt tạm fix → cycle này tái hiện `insertBefore`
+100%; bật lại fix → cycle giống hệt, sạch. Chi tiết xem Ghi chú TASK-29.
 
 ## Xong khi
 
