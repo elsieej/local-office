@@ -123,10 +123,13 @@ Trong lúc kiểm thử suýt kết luận nhầm: lần đầu expose `queryCli
 `useEffect`) làm vỡ SSR (`window is not defined` trên server) → gây ra
 MỘT lỗi `insertBefore` khác không liên quan (hydration mismatch do SSR
 crash), lẫn với lỗi thật. Sửa cách expose (đưa vào `useEffect`) rồi lặp
-lại mới xác nhận đúng, sạch — xem Ghi chú task đó để biết chi tiết. Chưa
-tái hiện được đúng kịch bản gốc (chuyển tab thật) bằng Playwright headless
-— CDP không mô phỏng đúng Page Visibility API của nhiều tab thật trong 1
-cửa sổ GUI — xác nhận gián tiếp qua `invalidateQueries` (cùng code path).
+lại mới xác nhận đúng, sạch. Sau đó tìm ra cách tái hiện đúng kịch bản gốc
+(chuyển tab thật) bằng CDP domain `Page.setWebLifecycleState('frozen'/
+'active')` — mô phỏng đúng tính năng tab-freezing thật của Chrome, khác
+hẳn `Emulation.setFocusEmulationEnabled` hay `page.bringToFront()` (cả 2
+đều không kích hoạt được gì trong Chromium headless) — xác nhận bằng
+feedback loop đỏ/xanh thật: tắt tạm fix → cycle này tái hiện `insertBefore`
+100%; bật lại fix → cycle giống hệt, sạch. Chi tiết xem Ghi chú TASK-29.
 
 ## Xong khi
 

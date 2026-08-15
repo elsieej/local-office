@@ -45,33 +45,43 @@ error boundary bắt lỗi, phải reload).
       refetch được (xác nhận không vô tình chặn luôn `saveMutation`/
       `deleteMutation` — 2 mutation này gọi `invalidateQueries` một cách
       tường minh, không phụ thuộc `staleTime`/`refetchOnWindowFocus`)
-- [ ] **Chưa xác nhận được bằng Playwright**: đúng kịch bản người dùng
-      báo cáo (chuyển tab trình duyệt thật, quay lại) — xem Ghi chú, giới
-      hạn môi trường test. Cần người dùng tự xác nhận trên trình duyệt
-      GUI thật trước khi đóng hẳn task này.
+- [x] **Tái hiện đúng kịch bản gốc bằng Playwright** (sau khi tìm ra CDP
+      domain đúng — xem Ghi chú): `Page.setWebLifecycleState('frozen')`
+      rồi `'active'` mô phỏng đúng việc Chrome tạm dừng/kích hoạt lại một
+      tab nền. Ở bản **trước khi vá**: cycle này tái hiện `insertBefore`
+      100% (dù `document.visibilityState` đọc qua `page.evaluate()` không
+      đổi giá trị — sự kiện lifecycle vẫn được bắn ra, `FocusManager` của
+      React Query vẫn bắt được). Ở bản **đã vá**: lặp lại đúng cycle đó,
+      console sạch (chỉ còn baseline 4 lỗi 404 đã biết) — xác nhận fix có
+      tác dụng thật, không chỉ đúng về lý thuyết
 
 ## Ghi chú
 
-**Vì sao không tái hiện được đúng kịch bản gốc (chuyển tab) bằng
-Playwright MCP**: đã thử nhiều cách — `browser_tabs` (select qua/lại 2
-tab), CDP `Emulation.setFocusEmulationEnabled(false/true)`, ghi đè trực
-tiếp `document.visibilityState`/`document.hidden` qua
-`Object.defineProperty` rồi dispatch `visibilitychange`/`focus`/`blur` —
-không cách nào khiến `document.hidden` thực sự đổi hoặc kích hoạt
-`FocusManager` của React Query refetch (`dataUpdatedAt` không đổi qua mọi
-lần thử). Trang chạy trong Chromium headless điều khiển qua CDP dường
-như không mô phỏng đúng Page Visibility API theo cách nhiều tab thật
-trong 1 cửa sổ trình duyệt GUI xử lý — đây là hạn chế của môi trường
-test, không phải bằng chứng bác bỏ nguyên nhân.
+**Cách tái hiện đúng kịch bản "chuyển tab" bằng Playwright — thử sai
+nhiều lần mới ra**: các cách "hiển nhiên" đều KHÔNG kích hoạt được gì —
+`browser_tabs` (select qua/lại 2 tab của MCP), `page.bringToFront()`
+(API chính thức của Playwright, khác hẳn MCP's `browser_tabs`), CDP
+`Emulation.setFocusEmulationEnabled(false/true)`, ghi đè trực tiếp
+`document.visibilityState`/`document.hidden` qua `Object.defineProperty`
+rồi dispatch `visibilitychange`/`focus`/`blur` thủ công — không cách nào
+khiến `document.hidden` đổi giá trị hay kích hoạt `FocusManager` của React
+Query (`dataUpdatedAt` không đổi qua mọi lần thử). Chromium headless
+dường như không mô phỏng occlusion giữa các tab (không có window manager
+thật để biết tab nào "che khuất" tab nào), nên Page Visibility API luôn
+báo `visible` bất kể cách nào tác động từ phía JS/CDP thông thường.
 
-**Cách xác nhận thay thế**: thay vì tái hiện đúng trigger "focus", xác
-nhận trực tiếp CƠ CHẾ mà `refetchOnWindowFocus` (mặc định `true` của
-React Query khi không set) sẽ kích hoạt — gọi thẳng
-`queryClient.invalidateQueries()` lên đúng query key mà `onFocus` handler
-nội bộ của thư viện sẽ gọi. Kết quả giống hệt nhau (cùng đường code:
-refetch → set data mới → effect deps đổi → remount editor giữa chừng),
-chỉ khác đường kích hoạt. Vá đúng nguyên nhân (tắt refetch tự động) nên
-tin tưởng được dù chưa tái hiện đúng 100% trigger gốc.
+Cách đúng: CDP domain **`Page.setWebLifecycleState`** (khác hẳn
+`Emulation.setFocusEmulationEnabled`) — dành riêng để giả lập tính năng
+"tab freezing/discarding" thật của Chrome (browser tự tạm dừng tab nền để
+tiết kiệm tài nguyên). Gọi `state: 'frozen'` rồi `state: 'active'` khiến
+Chrome tự bắn đúng chuỗi sự kiện lifecycle mà tab nền/foreground thật trải
+qua — `document.visibilityState` đọc qua `page.evaluate()` **vẫn không
+đổi giá trị quan sát được**, nhưng sự kiện DOM liên quan vẫn được dispatch
+đúng, đủ để `FocusManager` của React Query bắt được và trigger refetch.
+Xác nhận bằng cách tắt tạm `refetchOnWindowFocus`/`staleTime` (baseline
+trước-vá): cycle này tái hiện `insertBefore` 100%; bật lại fix, lặp đúng
+cycle: sạch. Đây mới là feedback loop tái hiện ĐÚNG trigger gốc, không
+phải suy luận gián tiếp qua `invalidateQueries` nữa.
 
 **Trong lúc kiểm thử phát hiện 1 false positive tự gây ra**: lần đầu
 expose `queryClient` qua `window.__qc = queryClient` viết thẳng trong
