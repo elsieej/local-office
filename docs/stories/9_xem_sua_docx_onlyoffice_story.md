@@ -22,8 +22,8 @@
 - [x] Sửa xong, bấm lưu → file cập nhật lại trong OPFS (vẫn 🔒 Cục bộ), không có request nào gửi nội dung ra ngoài máy
 - [x] Tải về sau khi sửa → file `.docx` mở được bằng Microsoft Office, giữ đúng nội dung đã sửa (khứ hồi thật, không mất định dạng)
 - [x] Ô tìm kiếm riêng trên header trang chi tiết (giao diện LocalOffice, không phải panel nổi của ONLYOFFICE) — gõ vào là khớp được highlight vàng trực quan ngay trong tài liệu, hoạt động cả 2 mode Xem/Sửa (xem TASK-28 và Ghi chú)
-- [ ] `browser_network_requests` trong suốt luồng xem/sửa/lưu: không có request nào ra ngoài domain LocalOffice (kế thừa câu hỏi mở từ US-8 — đo được thật lần đầu ở story này vì cần editor chạy thật)
-- [ ] Đo dung lượng thật trình duyệt tải ở lần mở editor đầu tiên, so với kỳ vọng "vài giây" của `CLAUDE.md` — ghi kết luận rõ ràng dù đạt hay không đạt (kế thừa từ US-8)
+- [ ] `browser_network_requests` trong suốt luồng xem/sửa/lưu: không có request nào ra ngoài domain LocalOffice (kế thừa câu hỏi mở từ US-8) — **đo xong ở TASK-27, chưa đạt 100%**: toàn bộ asset ONLYOFFICE (iframe editor) xác nhận 0 request ra ngoài, nhưng có 1 ngoại lệ đã biết ở window chính (`fonts.googleapis.com`, có từ trước US-9, không chứa nội dung tài liệu) — xem Ghi chú TASK-27, để ngỏ ô này tới khi có task tự host font riêng
+- [x] Đo dung lượng thật trình duyệt tải ở lần mở editor đầu tiên, so với kỳ vọng "vài giây" của `CLAUDE.md` — ghi kết luận rõ ràng dù đạt hay không đạt (kế thừa từ US-8) — **đo xong ở TASK-27: không đạt** (~8,2 giây bản production, ~11,9 MB), xem Ghi chú TASK-27
 - [x] File `.docx` hỏng/không parse được → báo lỗi rõ, không treo trang, không mất file gốc trong OPFS (kiểm ở TASK-21, mode Xem)
 - [x] Trang "Tải mã nguồn" (nghĩa vụ AGPL §13) có link thật trỏ đúng bản đang chạy, hiển thị được từ giao diện chính
 
@@ -43,8 +43,7 @@
       từ TASK-21 (icon HiDPI, dữ liệu spellcheck alphabet), không liên
       quan theme, xem Ghi chú task đó
 - [x] [TASK-26: Lưu khứ hồi thật vào OPFS khi bấm "Lưu" trong editor](../tasks/26_luu_khu_hoi_opfs_task.md) · #53
-- [ ] TASK-27: Đo network payload/egress thật (kế thừa US-8) — cần TASK-26
-      xong trước để đo đúng luồng lưu — chưa viết task doc
+- [x] [TASK-27: Đo network payload/egress thật lúc mở/sửa/lưu `.docx`](../tasks/27_do_network_payload_task.md) · #60
 - [x] [TASK-28: Ô tìm kiếm trên header, highlight trực tiếp trong tài liệu](../tasks/28_o_tim_kiem_header_task.md) · #56
 - [x] [TASK-29: Vá lỗi `insertBefore` khi tab được focus lại trong lúc đang mở `.docx`](../tasks/29_fix_insertbefore_refetch_task.md) · #58 —
       phát sinh ngoài kế hoạch, người dùng báo cáo trực tiếp, không thuộc
@@ -130,6 +129,23 @@ hẳn `Emulation.setFocusEmulationEnabled` hay `page.bringToFront()` (cả 2
 đều không kích hoạt được gì trong Chromium headless) — xác nhận bằng
 feedback loop đỏ/xanh thật: tắt tạm fix → cycle này tái hiện `insertBefore`
 100%; bật lại fix → cycle giống hệt, sạch. Chi tiết xem Ghi chú TASK-29.
+
+**TASK-27 — trả lời 2 câu hỏi mở kế thừa từ US-8**: đo trên bản
+**production** (`npm run build` + `npm run preview`), không phải dev
+server (Vite dev chưa minify cho số bi quan sai lệch nhiều). Cache trình
+duyệt xoá sạch trước khi đo (CDP `Network.clearBrowserCache`) để mô
+phỏng đúng "lần đầu". Kết quả: **~8,2 giây** tới khi editor sẵn sàng,
+**~11,9 MB** tổng dung lượng (asset ONLYOFFICE tải trong iframe riêng,
+có Performance Timeline tách biệt khỏi window chính — dễ bỏ sót nếu chỉ
+đo `performance` của window chính) — **không đạt** kỳ vọng "vài giây"
+của `CLAUDE.md`, dù đã là best-case (`localhost`, không có độ trễ mạng
+thật). Audit domain xuyên suốt Xem → Sửa → Lưu: asset ONLYOFFICE trong
+iframe xác nhận **0 request ra ngoài** (đúng cam kết Feature 3 mục 6),
+nhưng window chính có đúng 1 request cross-origin không đổi qua mọi thao
+tác (`fonts.googleapis.com`, ~1,1 KB, font UI chung toàn site có từ
+trước US-9, không chứa nội dung tài liệu) — chưa đạt tuyệt đối "0 request
+ra ngoài", để ngỏ cho task tự host font riêng sau này. Chi tiết đầy đủ
+xem Ghi chú TASK-27.
 
 ## Xong khi
 
