@@ -21,7 +21,7 @@
 - [x] Đang ở mode Sửa có thay đổi chưa lưu, người dùng rời trang (quay lại danh sách, chuyển sang mode Xem, đóng tab) → xác nhận qua `window.confirm` trước khi huỷ, giống mẫu đã dùng ở nút Xoá
 - [x] Sửa xong, bấm lưu → file cập nhật lại trong OPFS (vẫn 🔒 Cục bộ), không có request nào gửi nội dung ra ngoài máy
 - [x] Tải về sau khi sửa → file `.docx` mở được bằng Microsoft Office, giữ đúng nội dung đã sửa (khứ hồi thật, không mất định dạng)
-- [x] Tìm kiếm nội dung trong tài liệu, khớp được highlight trực quan (vàng cho mọi kết quả, đậm hơn cho kết quả đang chọn), điều hướng qua từng kết quả — hoạt động ngay ở mode Xem, không cần chuyển Sửa (có sẵn từ `DocEditor`, không cần code thêm — xem Ghi chú)
+- [x] Ô tìm kiếm riêng trên header trang chi tiết (giao diện LocalOffice, không phải panel nổi của ONLYOFFICE) — gõ vào là khớp được highlight vàng trực quan ngay trong tài liệu, hoạt động cả 2 mode Xem/Sửa (xem TASK-28 và Ghi chú)
 - [ ] `browser_network_requests` trong suốt luồng xem/sửa/lưu: không có request nào ra ngoài domain LocalOffice (kế thừa câu hỏi mở từ US-8 — đo được thật lần đầu ở story này vì cần editor chạy thật)
 - [ ] Đo dung lượng thật trình duyệt tải ở lần mở editor đầu tiên, so với kỳ vọng "vài giây" của `CLAUDE.md` — ghi kết luận rõ ràng dù đạt hay không đạt (kế thừa từ US-8)
 - [x] File `.docx` hỏng/không parse được → báo lỗi rõ, không treo trang, không mất file gốc trong OPFS (kiểm ở TASK-21, mode Xem)
@@ -45,6 +45,7 @@
 - [ ] [TASK-26: Lưu khứ hồi thật vào OPFS khi bấm "Lưu" trong editor](../tasks/26_luu_khu_hoi_opfs_task.md) · #53
 - [ ] TASK-27: Đo network payload/egress thật (kế thừa US-8) — cần TASK-26
       xong trước để đo đúng luồng lưu — chưa viết task doc
+- [ ] [TASK-28: Ô tìm kiếm trên header, highlight trực tiếp trong tài liệu](../tasks/28_o_tim_kiem_header_task.md) · #56
 
 ## Ghi chú
 
@@ -75,19 +76,31 @@ Lớp giả lập ở TASK-21 chuyển thể (adapt) từ mã nguồn AGPL-3.0 c
 (`utils/editor/*.ts`) — cùng giấy phép với LocalOffice từ TASK-20, ghi rõ
 nguồn ở đầu từng file chuyển thể.
 
-**Tìm kiếm nội dung không cần task riêng**: có câu hỏi phát sinh sau
-TASK-26 — người dùng cần tìm một đoạn chữ trong tài liệu thì làm sao
-highlight trực quan cho họ thấy? Ban đầu tưởng cần code thêm (kiểu tìm
-kiếm theo trang của PDF ở
-[TASK-16](../tasks/16_pdf_viewer_task.md#kiểm-thử), vốn **chưa** highlight
-đúng vị trí, chỉ nhảy tới đúng trang). Với `.docx` thì khác: bản thân
+**Tìm kiếm nội dung — kết luận ban đầu bị đổi lại sau đó**: có câu hỏi
+phát sinh sau TASK-26 — người dùng cần tìm một đoạn chữ trong tài liệu
+thì làm sao highlight trực quan cho họ thấy? Kết luận lúc đó: bản thân
 `DocEditor` đã có sẵn panel "Tìm kiếm" (nút kính lúp ở left menu, hoặc
-Ctrl+F khi con trỏ đang ở trong iframe editor) — xác nhận bằng Playwright
-MCP thật ở mode Xem: gõ từ khoá, mọi kết quả khớp được tô vàng, kết quả
-đang chọn tô đậm hơn, bộ đếm "x/y" và nút điều hướng next/prev đều đúng.
-Không đụng tới `EditorServer`/`fetch`-proxy/OPFS — thuần tính năng có sẵn
-trong bundle `web-apps` đã vendor từ TASK-19, chỉ cần xác nhận nó hoạt
-động đúng qua lớp giả lập Document Server, không cần viết task/issue mới.
+Ctrl+F trong iframe editor) — xác nhận bằng Playwright MCP thật, không
+cần code thêm. Ngay sau đó người dùng yêu cầu cụ thể hơn: một ô tìm kiếm
+**thuộc giao diện LocalOffice** (trên header trang chi tiết), không phải
+panel nổi rời rạc của ONLYOFFICE — đổi hẳn kết luận, thành TASK-28 (có
+code thật).
+
+Cách TASK-28 làm: `DocEditor` không có API tìm kiếm chính thức nào lộ ra
+ngoài qua `DocsAPI.DocEditor` (chỉ có `downloadAs`, `requestClose`,...) —
+gọi thẳng object nội bộ `window.editor` (`asc_findText`, minified,
+không ổn định giữa các bản build) rủi ro hơn nhiều so với **tái dùng
+chính DOM của panel "Tìm kiếm" có sẵn** (`#search-bar-text`, id ổn định,
+không bị minify vì là id HTML) — ô header của LocalOffice ghi giá trị
+vào đúng input đó (qua native setter + dispatch sự kiện `input`, giống
+hệt cách người dùng gõ tay) rồi ẩn hẳn panel nổi bằng CSS
+(`.search-bar { display: none }`) chèn ngay từ `onAppReady`. Panel chưa
+từng mở thì chưa có DOM (`#search-bar-text` không tồn tại) — mở lần đầu
+bằng cách giả lập sự kiện bàn phím Ctrl+F (`KeyboardEvent` dựng tay,
+không cần phím thật — đã xác nhận: chỉ cần đúng `ctrlKey`/`key`, không
+quan tâm `isTrusted`) vào `#id_main` của iframe. Đánh đổi đã biết: mất
+bộ đếm "x/y" và nút điều hướng next/prev của panel gốc (đã ẩn theo panel)
+— để lại cho sau nếu cần, phạm vi TASK-28 chỉ cần highlight-khi-gõ.
 
 ## Xong khi
 

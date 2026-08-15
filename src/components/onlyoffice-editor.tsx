@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react'
+import type { ForwardedRef } from 'react'
 import { useBlocker } from '@tanstack/react-router'
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert'
 import { Skeleton } from '#/components/ui/skeleton'
@@ -63,6 +70,20 @@ function syncOnlyofficeThemeCache(theme: 'theme-classic-light' | 'theme-dark') {
   }
 }
 
+// Panel "Tìm kiếm" nổi có sẵn của DocEditor (mở qua Ctrl+F, id `search-bar-*`
+// bên trong iframe — xem `doSearch` bên dưới) làm việc tìm/highlight thật,
+// nhưng UI của nó nổi đè lên tài liệu và không khớp giao diện LocalOffice.
+// Ẩn nó bằng CSS ngay từ đầu, dùng chính panel đó (ẩn) làm "engine" đứng
+// sau ô tìm kiếm trên header của $documentId.tsx.
+const SEARCH_BAR_HIDE_STYLE = '.search-bar { display: none !important; }'
+const SEARCH_BAR_OPEN_POLL_MS = 50
+const SEARCH_BAR_OPEN_POLL_MAX = 20
+
+export type OnlyofficeEditorHandle = {
+  /** Tìm + highlight `query` trong tài liệu; `query` rỗng xoá highlight. */
+  search: (query: string) => void
+}
+
 type OnlyofficeEditorProps = {
   file: File
   /** Đuôi file không có dấu chấm, vd "docx" — dùng làm input cho x2t. */
@@ -71,15 +92,14 @@ type OnlyofficeEditorProps = {
   mode: 'view' | 'edit'
   /** Gọi khi người dùng bấm "Lưu" trong editor — xem EditorServer.onNativeSave. */
   onSave?: (file: File) => void | Promise<void>
+  /** Gọi khi tài liệu đã hiện xong — trước đó gọi `search` qua ref là vô tác dụng. */
+  onReady?: () => void
 }
 
-export default function OnlyofficeEditor({
-  file,
-  fileType,
-  title,
-  mode,
-  onSave,
-}: OnlyofficeEditorProps) {
+function OnlyofficeEditor(
+  { file, fileType, title, mode, onSave, onReady }: OnlyofficeEditorProps,
+  ref: ForwardedRef<OnlyofficeEditorHandle>,
+) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const isDirtyRef = useRef(false)
@@ -94,6 +114,78 @@ export default function OnlyofficeEditor({
   useEffect(() => {
     onSaveRef.current = onSave
   }, [onSave])
+
+  const onReadyRef = useRef(onReady)
+  useEffect(() => {
+    onReadyRef.current = onReady
+  }, [onReady])
+
+  // `doc`/`win` của iframe editor — cần cho `doSearch` (điều khiển panel
+  // "Tìm kiếm" nội bộ của DocEditor thay cho ô search trên header). Không
+  // dùng state vì đổi giá trị này không cần re-render gì.
+  const frameRef = useRef<{
+    doc: Document
+    win: Window & typeof globalThis
+  } | null>(null)
+
+  function doSearch(query: string) {
+    const frame = frameRef.current
+    if (!frame) return
+    const { doc, win } = frame
+
+    function setValue(input: HTMLInputElement) {
+      const nativeSetter = Object.getOwnPropertyDescriptor(
+        win.HTMLInputElement.prototype,
+        'value',
+      )?.set
+      nativeSetter?.call(input, query)
+      input.dispatchEvent(new win.Event('input', { bubbles: true }))
+    }
+
+    const existing = doc.getElementById(
+      'search-bar-text',
+    ) as HTMLInputElement | null
+    if (existing) {
+      setValue(existing)
+      return
+    }
+
+    // Panel "Tìm kiếm" chưa từng mở trong phiên này — chưa có DOM, phải mở
+    // bằng phím tắt giả lập trước (đã xác nhận bằng thực nghiệm: KeyboardEvent
+    // giả lập, không cần phím thật, vẫn kích được listener nội bộ của
+    // DocEditor), rồi đợi DOM của nó xuất hiện mới gõ được giá trị vào.
+    const target = doc.getElementById('id_main') ?? doc.body
+    target.dispatchEvent(
+      new win.KeyboardEvent('keydown', {
+        key: 'f',
+        code: 'KeyF',
+        keyCode: 70,
+        which: 70,
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      }),
+    )
+
+    let attempts = 0
+    const poll = () => {
+      if (frameRef.current !== frame) return // unmount/remount giữa chừng
+      const input = doc.getElementById(
+        'search-bar-text',
+      ) as HTMLInputElement | null
+      if (input) {
+        setValue(input)
+        return
+      }
+      attempts += 1
+      if (attempts < SEARCH_BAR_OPEN_POLL_MAX) {
+        setTimeout(poll, SEARCH_BAR_OPEN_POLL_MS)
+      }
+    }
+    setTimeout(poll, SEARCH_BAR_OPEN_POLL_MS)
+  }
+
+  useImperativeHandle(ref, () => ({ search: doSearch }), [])
 
   // Lấp phần viewport còn lại thay vì cố định chiều cao — đo bằng JS (thay
   // vì CSS thuần) vì chiều cao header/card phía trên nằm ở component khác,
@@ -178,6 +270,16 @@ export default function OnlyofficeEditor({
           )
         },
       })
+
+      frameRef.current = { doc: iframe.contentDocument, win }
+
+      // Ẩn ngay từ đầu, không đợi người dùng mở — CSS áp dụng cho phần tử
+      // tương lai khớp selector nên chèn sớm là đủ, không cần panel đã tồn
+      // tại. Ô tìm kiếm trên header ($documentId.tsx) thay thế hẳn vai trò
+      // hiển thị của panel này, chỉ dùng lại phần "engine" tìm/highlight.
+      const hideStyle = iframe.contentDocument.createElement('style')
+      hideStyle.textContent = SEARCH_BAR_HIDE_STYLE
+      iframe.contentDocument.head.appendChild(hideStyle)
     }
 
     function createEditor() {
@@ -233,7 +335,10 @@ export default function OnlyofficeEditor({
         events: {
           onAppReady: () => onAppReady(),
           onDocumentReady: () => {
-            if (!cancelled) setStatus('ready')
+            if (!cancelled) {
+              setStatus('ready')
+              onReadyRef.current?.()
+            }
           },
           onError: (e: unknown) =>
             fail('ONLYOFFICE báo lỗi khi mở tài liệu.', e),
@@ -304,6 +409,7 @@ export default function OnlyofficeEditor({
       MockSocket.off('disconnect', server.handleDisconnect)
       editor?.destroyEditor()
       server.destroy()
+      frameRef.current = null
     }
   }, [file, fileType, title, mode])
 
@@ -338,3 +444,5 @@ export default function OnlyofficeEditor({
     </div>
   )
 }
+
+export default forwardRef(OnlyofficeEditor)
