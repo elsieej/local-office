@@ -21,6 +21,7 @@
 - [x] Đang ở mode Sửa có thay đổi chưa lưu, người dùng rời trang (quay lại danh sách, chuyển sang mode Xem, đóng tab) → xác nhận qua `window.confirm` trước khi huỷ, giống mẫu đã dùng ở nút Xoá
 - [x] Sửa xong, bấm lưu → file cập nhật lại trong OPFS (vẫn 🔒 Cục bộ), không có request nào gửi nội dung ra ngoài máy
 - [x] Tải về sau khi sửa → file `.docx` mở được bằng Microsoft Office, giữ đúng nội dung đã sửa (khứ hồi thật, không mất định dạng)
+- [x] Tìm kiếm nội dung trong tài liệu, khớp được highlight trực quan (vàng cho mọi kết quả, đậm hơn cho kết quả đang chọn), điều hướng qua từng kết quả — hoạt động ngay ở mode Xem, không cần chuyển Sửa (có sẵn từ `DocEditor`, không cần code thêm — xem Ghi chú)
 - [ ] `browser_network_requests` trong suốt luồng xem/sửa/lưu: không có request nào ra ngoài domain LocalOffice (kế thừa câu hỏi mở từ US-8 — đo được thật lần đầu ở story này vì cần editor chạy thật)
 - [ ] Đo dung lượng thật trình duyệt tải ở lần mở editor đầu tiên, so với kỳ vọng "vài giây" của `CLAUDE.md` — ghi kết luận rõ ràng dù đạt hay không đạt (kế thừa từ US-8)
 - [x] File `.docx` hỏng/không parse được → báo lỗi rõ, không treo trang, không mất file gốc trong OPFS (kiểm ở TASK-21, mode Xem)
@@ -73,6 +74,20 @@ Lớp giả lập ở TASK-21 chuyển thể (adapt) từ mã nguồn AGPL-3.0 c
 [baotlake/office-website](https://github.com/baotlake/office-website)
 (`utils/editor/*.ts`) — cùng giấy phép với LocalOffice từ TASK-20, ghi rõ
 nguồn ở đầu từng file chuyển thể.
+
+**Tìm kiếm nội dung không cần task riêng**: có câu hỏi phát sinh sau
+TASK-26 — người dùng cần tìm một đoạn chữ trong tài liệu thì làm sao
+highlight trực quan cho họ thấy? Ban đầu tưởng cần code thêm (kiểu tìm
+kiếm theo trang của PDF ở
+[TASK-16](../tasks/16_pdf_viewer_task.md#kiểm-thử), vốn **chưa** highlight
+đúng vị trí, chỉ nhảy tới đúng trang). Với `.docx` thì khác: bản thân
+`DocEditor` đã có sẵn panel "Tìm kiếm" (nút kính lúp ở left menu, hoặc
+Ctrl+F khi con trỏ đang ở trong iframe editor) — xác nhận bằng Playwright
+MCP thật ở mode Xem: gõ từ khoá, mọi kết quả khớp được tô vàng, kết quả
+đang chọn tô đậm hơn, bộ đếm "x/y" và nút điều hướng next/prev đều đúng.
+Không đụng tới `EditorServer`/`fetch`-proxy/OPFS — thuần tính năng có sẵn
+trong bundle `web-apps` đã vendor từ TASK-19, chỉ cần xác nhận nó hoạt
+động đúng qua lớp giả lập Document Server, không cần viết task/issue mới.
 
 ## Xong khi
 
